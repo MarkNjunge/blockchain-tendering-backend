@@ -6,6 +6,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
+    "admin:clean-docker": "yarn --cwd admin clean-docker",
     "composer:deploy": "yarn --cwd composer deploy",
     "composer:upgrade:patch": "yarn --cwd composer upgrade:patch",
     "composer:start:rest": "yarn --cwd composer start:rest"

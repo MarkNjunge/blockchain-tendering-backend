@@ -6,7 +6,8 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "create:participant": "node create-participant.js"
+    "create:participant": "node create-participant.js",
+    "clean-docker": "node clean-docker.js"
   },
   "dependencies": {
     "casual": "^1.6.2",
@@ -15,6 +16,7 @@
     "composer-client": "^0.20.8",
     "composer-common": "^0.20.8",
     "ora": "^3.4.0",
-    "prompts": "^2.2.1"
+    "prompts": "^2.2.1",
+    "semver": "^6.3.0"
   }
 }

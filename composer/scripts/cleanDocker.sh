@@ -1,1 +1,0 @@
-docker ps | awk '{print $2}' | rg dev-peer0.org1.example.com-tendering
