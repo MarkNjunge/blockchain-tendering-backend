@@ -1,0 +1,90 @@
+namespace com.marknjunge.tendering.tender
+
+import com.marknjunge.tendering.participant.*
+
+concept TenderAmendment {
+  o String documentUrl
+  o String documentHash
+  o DateTime datePosted
+}
+
+concept Document {
+  o String url
+  o String hash
+  o DateTime datePosted
+}
+
+asset TenderDocument identified by tenderId {
+  o String tenderId
+  --> TenderingOrganization organization
+  o String title
+  o Document document
+  o DateTime deadline
+  o DateTime datePosted
+  o Boolean withdrawn default=false
+  o String withdrawalReason optional
+  o TenderAmendment[] amendments optional
+}
+
+asset TenderBid identified by bidId{
+ o String bidId
+ --> TenderDocument tenderDocument
+ --> TenderBidder bidder
+ o String summary
+ o DateTime datePosted
+ o Document bidDocument
+ o Document[] documentHistory optional
+ o Boolean withdrawn default=false
+}
+  
+asset TenderOpeningRegister identified by registerId {
+  o String registerId 
+  --> TenderDocument tender
+  o Person[] person
+  o DateTime date
+}
+
+asset TenderResult identified by resultId {
+  o String resultId
+  --> TenderDocument tender
+  --> TenderBid winningBid
+  o DateTime datePosted
+  o Boolean disputed default=false
+  o Boolean nullified default=false
+  o Document nullificationDocument optional
+} 
+
+enum RejectionReason {
+  o UNRESPONSIVE
+  o OTHER
+}
+  
+asset TenderRejection identified by rejectionId {
+  o String rejectionId 
+  --> TenderBid bidId
+  o RejectionReason reason
+  o String reasonNarrative
+}
+
+transaction PlaceBid {
+  o TenderBid bid
+  --> TenderDocument tender
+}
+
+transaction WithdrawTenderBid {
+  --> TenderBid bid
+}
+
+transaction WithdrawTender {
+  --> TenderDocument tender
+  o String reason optional
+}
+
+transaction DisputeTender {
+  --> TenderResult tenderResult
+}
+
+transaction NullifyTender {
+  --> TenderResult tenderResult
+  o Document nullificationDocument
+}

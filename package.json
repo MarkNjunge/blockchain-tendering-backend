@@ -1,0 +1,13 @@
+{
+  "name": "blockchain-tendering",
+  "version": "1.0.0",
+  "description": "Blockchain-based tendering system.",
+  "author": "Mark Njung'e",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "composer:deploy": "yarn --cwd composer deploy",
+    "composer:upgrade:patch": "yarn --cwd composer upgrade:patch",
+    "composer:start:rest": "yarn --cwd composer start:rest"
+  }
+}

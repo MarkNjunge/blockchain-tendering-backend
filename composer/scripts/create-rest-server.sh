@@ -1,0 +1,1 @@
+composer-rest-server -c admin@tendering -n never -u true -w true

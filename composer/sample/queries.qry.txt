@@ -1,0 +1,15 @@
+/**
+ * New query file
+ */
+query selectOwners {
+  description: "Select all owners"
+  statement:
+      SELECT com.marknjunge.petadoption.Owner
+}
+
+query selectPetsForOwner {
+  description: "Select all pets based on their owner"
+  statement:
+      SELECT com.marknjunge.petadoption.Pet
+          WHERE (owner == _$owner)
+}

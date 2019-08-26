@@ -1,0 +1,50 @@
+/**
+ * Sample business network definition.
+ */
+namespace com.marknjunge.petadoption
+
+/**
+ * Represents an animal that can be adopted
+ */ 
+asset Pet identified by petId {
+  o String petId
+  o String name
+  o PetType type
+  o String Description
+  o Boolean available default=false
+  --> Owner owner optional
+  --> PastOwner[] pastOwners optional
+}
+  
+asset PastOwner identified by histId {
+  o String histId
+  --> Owner owner
+}
+  
+enum PetType {
+  o CAT
+  o DOG
+}
+
+participant Owner identified by ownerId {
+ o String ownerId
+ o String name
+}
+  
+transaction SetAdoptionAvailability {
+ --> Pet pet 
+  o Boolean available
+}
+  
+transaction AdoptPet {
+  --> Pet pet
+  --> Owner owner
+}
+  
+transaction UnAdoptPet {
+  --> Pet pet
+}
+ 
+transaction SeedOwners {
+  o Integer number
+}

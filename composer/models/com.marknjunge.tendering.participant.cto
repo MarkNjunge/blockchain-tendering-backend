@@ -1,0 +1,61 @@
+namespace com.marknjunge.tendering.participant
+
+concept Contact {
+  o String email
+  o String phone regex=/^(254)\d{9}$/
+  o String streetAddress
+}
+
+abstract participant TenderingParticipant identified by participantId{
+  o String participantId
+  o String name
+  o Contact contact
+}
+
+participant TenderingOrganization extends TenderingParticipant {
+ 
+}
+
+participant TenderBidder extends TenderingParticipant{
+ o String companyRegNo
+}
+
+participant RegulatoryAuthority extends TenderingParticipant {
+ 
+}
+
+participant Person identified by personId {
+  o String personId
+  o String fullName
+  o Integer idNumber
+  o String phoneNumber
+}
+
+transaction CreateTenderingOrganization {
+  o String participantId optional
+  o String name
+  o String email
+  o String phone
+  o String streetAddress
+}
+
+transaction CreateTenderBidder {
+  o String participantId optional
+  o String name
+  o String companyRegNo
+  o String email
+  o String phone
+  o String streetAddress
+}
+
+transaction CreateRegulatoryAuthority {
+  o String participantId optional
+  o String name
+  o String email
+  o String phone
+  o String streetAddress
+}
+
+event ParticipantCreated {
+  o String participantId
+}

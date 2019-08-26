@@ -1,0 +1,20 @@
+{
+  "name": "blockchain-tendering-admin",
+  "version": "1.0.0",
+  "description": "Blockchain-based tendering system.",
+  "author": "Mark Njung'e",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "create:participant": "node create-participant.js"
+  },
+  "dependencies": {
+    "casual": "^1.6.2",
+    "composer-admin": "^0.20.8",
+    "composer-cli": "^0.20.8",
+    "composer-client": "^0.20.8",
+    "composer-common": "^0.20.8",
+    "ora": "^3.4.0",
+    "prompts": "^2.2.1"
+  }
+}

@@ -1,0 +1,12 @@
+query selectAllBidders {
+  description: "Select all bidders"
+  statement:
+      SELECT com.marknjunge.tendering.participant.TenderBidder
+}
+
+query selectAllBidsForBidder {
+  description: "Select all bids based for a bidder"
+  statement:
+      SELECT com.marknjunge.tendering.tender.TenderBid
+          WHERE (bidder == _$bidder)
+}

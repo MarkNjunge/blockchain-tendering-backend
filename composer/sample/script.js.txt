@@ -1,0 +1,92 @@
+/* global getAssetRegistry getFactory emit */
+
+/**
+* Makes a pet available for adoption
+* @param {com.marknjunge.petadoption.SetAdoptionAvailability} tx The transaction instance
+* @transaction
+*/
+async function SetAdoptionAvailability(tx) {
+  if(tx.pet.owner && tx.available == true){
+    throw new Error("A pet with an owner can't be up for adoption")
+  }
+  
+  tx.pet.available = tx.available;
+  
+  const assetRegistry = await getAssetRegistry("com.marknjunge.petadoption.Pet");
+  await assetRegistry.update(tx.pet);
+}
+
+/**
+* Adopts a pet
+* @param {com.marknjunge.petadoption.AdoptPet} tx The transaction instance
+* @transaction
+*/
+async function AdoptPet(tx) {
+  
+  if(tx.pet.available != true || tx.pet.owner){
+    throw new Error("The pet is not available for adoption!");
+  }
+  
+  const factory = getFactory();
+  const NameSpace = "com.marknjunge.petadoption"
+
+  const pastOwner = factory.newResource(NameSpace, "PastOwner", tx.owner.getIdentifier());
+  pastOwner.owner = tx.owner;
+ 
+  if(tx.pet.pastOwners){
+    tx.pet.pastOwners.push(pastOwner);
+  } else {
+    tx.pet.pastOwners = [];
+    tx.pet.pastOwners.push(pastOwner);
+  }
+  
+  tx.pet.owner = tx.owner;
+  tx.pet.available = false;
+  
+  const assetRegistry = await getAssetRegistry("com.marknjunge.petadoption.Pet");
+  await assetRegistry.update(tx.pet);
+}
+
+/**
+* Unadpots a pet
+* @param {com.marknjunge.petadoption.UnAdoptPet} tx The transaction instance
+* @transaction
+*/
+async function UnAdoptPet(tx) {
+  
+  tx.pet.available = true;
+  
+  tx.pet.owner = null;
+  
+  const assetRegistry = await getAssetRegistry("com.marknjunge.petadoption.Pet");
+  await assetRegistry.update(tx.pet);
+}
+
+/**
+* Creates a number of owners
+* @param {com.marknjunge.petadoption.SeedOwners} tx The transaction instance
+* @transaction
+*/
+async function SeedOwners(tx) {
+  
+  const factory = getFactory();
+  const NameSpace = "com.marknjunge.petadoption"
+  
+  for (var i = 0; i < tx.number; i++) { 
+    const name = getName();
+    
+    const owner = factory.newResource(NameSpace, "Owner", name.toUpperCase());
+    owner.name = name
+    
+    const participantRegistry = await getParticipantRegistry("com.marknjunge.petadoption.Owner");
+    await participantRegistry.add(owner);
+  }  
+}
+
+function getName(){
+  const names = ['Aaliyah', 'Aaron', 'Abagail', 'Abbey', 'Abbie', 'Abbigail', 'Abby', 'Abdiel', 'Abdul', 'Abdullah', 'Abe', 'Abel', 'Abelardo', 'Abigail', 'Abigale', 'Abigayle', 'Abner', 'Abraham', 'Ada', 'Adah', 'Adalberto', 'Adaline', 'Adam', 'Adan', 'Addie', 'Addison', 'Adela', 'Adelbert', 'Adele', 'Adelia', 'Adeline', 'Adell', 'Adella', 'Adelle', 'Aditya', 'Adolf', 'Adolfo', 'Adolph', 'Adolphus', 'Adonis', 'Adrain', 'Adrian', 'Adriana', 'Adrianna', 'Adriel', 'Adrien', 'Adrienne', 'Afton', 'Aglae', 'Agnes', 'Agustin', 'Agustina', 'Ahmad', 'Ahmed', 'Aida'];
+        
+ const randomNumber = Math.floor(Math.random() * names.length)
+       
+ return names[randomNumber];
+}
