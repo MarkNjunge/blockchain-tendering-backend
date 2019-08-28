@@ -7,7 +7,7 @@
   "description": "Blockchain based tendering system",
   "scripts": {
     "deploy": "cd scripts && ./deploy.sh",
-    "upgrade:patch": "npm version patch && cd scripts && ./upgrade.sh",
+    "upgrade:patch": "npm --no-git-tag-version version patch && cd scripts && ./upgrade.sh",
     "start:rest": "cd scripts && ./create-rest-server.sh",
     "lint": "eslint .",
     "pretest": "npm run lint",
