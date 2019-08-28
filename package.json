@@ -7,6 +7,7 @@
   "private": false,
   "scripts": {
     "admin:clean-docker": "yarn --cwd admin clean-docker",
+    "admin:create-participant": "yarn --cwd admin create-participant",
     "composer:deploy": "yarn --cwd composer deploy",
     "composer:upgrade:patch": "yarn --cwd composer upgrade:patch",
     "composer:start:rest": "yarn --cwd composer start:rest"

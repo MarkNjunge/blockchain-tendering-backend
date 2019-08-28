@@ -6,7 +6,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "create:participant": "node create-participant.js",
+    "create-participant": "node create-participant.js",
     "clean-docker": "node clean-docker.js"
   },
   "dependencies": {

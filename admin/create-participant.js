@@ -1,5 +1,6 @@
 const ora = require("ora");
 const casual = require("casual");
+const prompts = require("prompts");
 const connectionUtil = require("./connection-util");
 const IdCard = require("composer-common").IdCard;
 const NetworkCardStoreManager = require("composer-common")
@@ -24,9 +25,36 @@ const cardStore = NetworkCardStoreManager.getCardStore(cardType);
     // Get issuing card (admin card)
     const adminCard = await cardStore.get(cardName);
 
+    // Get desired participant
+    const questions = [
+      {
+        type: "select",
+        name: "participant",
+        message: "Which participant?",
+        choices: [
+          { title: "TenderingOrganization", value: "TenderingOrganization" },
+          { title: "TenderBidder", value: "TenderBidder" },
+          { title: "RegulatoryAuthority", value: "RegulatoryAuthority" }
+        ]
+      }
+    ];
+
+    const response = await prompts(questions);
+
     // Create transaction to create new participant
-    const txn = createTenderingOrgTransaction();
-    console.log(`Creating participant ${txn.name}`);
+    let txn;
+    switch (response.participant) {
+    case "TenderingOrganization":
+      txn = createTenderingOrgTransaction();
+      break;
+    case "TenderBidder":
+      txn = createTenderBidderTransaction();
+      break;
+    case "RegulatoryAuthority":
+      txn = createRegulatoryAuthorityTransaction();
+      break;
+    }
+    console.log(`Creating ${response.participant}: ${txn.name}`);
 
     // Make transaction to create participant
     await connection.submitTransaction(txn);
@@ -34,7 +62,7 @@ const cardStore = NetworkCardStoreManager.getCardStore(cardType);
 
     // Issue an identity to the new participant
     const result = await connection.issueIdentity(
-      `${participantNS}.TenderingOrganization#${txn.participantId}`,
+      `${participantNS}.${response.participant}#${txn.participantId}`,
       txn.name.replace(/ +/g, "")
     );
     console.log("Identity issued!");
@@ -86,6 +114,45 @@ function createTenderingOrgTransaction() {
   );
   const name = casual.company_name;
   txn.setPropertyValue("participantId", `TORG#${getRandomInt(9999)}`);
+  txn.setPropertyValue("name", name);
+  txn.setPropertyValue(
+    "email",
+    `contact@${name.replace(/ +/g, "").toLowerCase()}.com`
+  );
+  txn.setPropertyValue("phone", `${casual.numerify("2547########")}`);
+  txn.setPropertyValue("streetAddress", casual.address1);
+
+  return txn;
+}
+
+function createTenderBidderTransaction() {
+  const bnDef = connection.getBusinessNetwork();
+  const factory = bnDef.getFactory();
+  let txn = factory.newTransaction(participantNS, "CreateTenderBidder");
+  const name = casual.company_name;
+  txn.setPropertyValue("participantId", `BIDDER#${getRandomInt(9999)}`);
+  txn.setPropertyValue("name", name);
+  txn.setPropertyValue(
+    "companyRegNo",
+    casual.integer(100000, 999999).toString()
+  );
+  txn.setPropertyValue(
+    "email",
+    `cotnact@${name.replace(/ +/g, "").toLowerCase()}.com`
+  );
+  txn.setPropertyValue("phone", `${casual.numerify("2547########")}`);
+  txn.setPropertyValue("streetAddress", casual.address1);
+
+  return txn;
+}
+
+function createRegulatoryAuthorityTransaction() {
+  const bnDef = connection.getBusinessNetwork();
+  const factory = bnDef.getFactory();
+
+  let txn = factory.newTransaction(participantNS, "CreateRegulatoryAuthority");
+  const name = casual.company_name;
+  txn.setPropertyValue("participantId", `REGAUTH#${getRandomInt(9999)}`);
   txn.setPropertyValue("name", name);
   txn.setPropertyValue(
     "email",
