@@ -2,14 +2,21 @@ const { exec } = require("child_process");
 const semver = require("semver");
 
 (async () => {
-  await removeContainers();
-  await removeImages();
+  const all = process.argv[2] ? true : false;
+  await removeContainers(all);
+  await removeImages(all);
 })();
 
-async function removeContainers() {
-  const listContainersRes = await execAwait(
-    "docker ps | awk '{print $1 \" \" $2}' | grep dev-peer0.org1.example.com-tendering"
-  );
+async function removeContainers(removeAll) {
+  let listContainersRes;
+  try {
+    listContainersRes = await execAwait(
+      "docker ps -a | awk '{print $1 \" \" $2}' | grep dev-peer0.org1.example.com-tendering"
+    );
+  } catch (e) {
+    // This will fail if there are no valid containers
+    return;
+  }
 
   // Get the stale verions
   let containers = listContainersRes.stdout
@@ -25,12 +32,9 @@ async function removeContainers() {
     })
     .sort((a, b) => semver.rcompare(a.version, b.version)); // Sort the versions
 
-  if (containers.length == 1) {
-    console.log("Only one container was found. Skipping...");
-    return;
+  if (!removeAll) {
+    containers = [containers.pop()]; // Remove the latest (at the end of the array)
   }
-
-  containers = [containers.pop()]; // Remove the latest (at the end of the array)
 
   await asyncForEach(containers, async c => {
     console.log(`Stopping ${c.containerId}...`);
@@ -42,10 +46,16 @@ async function removeContainers() {
   });
 }
 
-async function removeImages() {
-  const res = await execAwait(
-    "docker images | awk '{print $1 \" \" $3}' | grep dev-peer0.org1.example.com-tendering"
-  );
+async function removeImages(removeAll) {
+  let res;
+  try {
+    res = await execAwait(
+      "docker images | awk '{print $1 \" \" $3}' | grep dev-peer0.org1.example.com-tendering"
+    );
+  } catch (e) {
+    // This will fail if there are no valid containers
+    return;
+  }
 
   // Get the stale verions
   let images = res.stdout
@@ -61,12 +71,9 @@ async function removeImages() {
     })
     .sort((a, b) => semver.rcompare(a.version, b.version)); // Sort the versions
 
-  if (images.length == 1) {
-    console.log("Only one image was found. Skipping...");
-    return;
+  if (!removeAll) {
+    images = [images.pop()]; // Remove the latest (at the end of the array)
   }
-
-  images = [images.pop()]; // Remove the latest (at the end of the array)
 
   await asyncForEach(images, async c => {
     console.log(`Stopping ${c.imageId}...`);

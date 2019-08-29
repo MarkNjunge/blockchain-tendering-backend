@@ -36,7 +36,9 @@ The following scripts are run at the top level folder.
 
 #### admin:clean-docker
 
-Removes all non-latest docker containers and images for the project.
+Removes docker containers and images for the project.
+
+Use `yarn admin:clean-docker all` to remove all, omit to remove all non-latest.
 
 #### admin:create-participant
 
