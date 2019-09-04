@@ -151,6 +151,33 @@ async function WithdrawTender(tx) {
   await tenderNoticeRegistry.update(tender);
 }
 
+/**
+ * Add an amendment to a tender
+ * @param {com.marknjunge.tendering.tender.AmendTender} tx Transaction
+ * @transaction
+ */
+async function AmendTender(tx) {
+  const tenderNoticeRegistry = await getAssetRegistry(
+    `${assetNS}.TenderNotice`
+  );
+  const factory = getFactory();
+
+  const amendment = factory.newConcept(assetNS, "Document");
+  amendment.documentUrl = tx.documentUrl;
+  amendment.documentHash = tx.documentHash;
+  amendment.datePosted = new Date();
+
+  const tender = await tenderNoticeRegistry.get(tx.tenderId);
+
+  if (!tender.amendments) {
+    tender.amendments = [];
+  }
+
+  tender.amendments.push(amendment);
+
+  await tenderNoticeRegistry.update(tender);
+}
+
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
 }

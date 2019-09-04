@@ -91,3 +91,13 @@ transaction WithdrawTender {
 event TenderWithdrawn {
   o String tenderId
 }
+  
+transaction AmendTender {
+  o String tenderId
+  o String documentUrl
+  o String documentHash
+}
+  
+event TenderAmended {
+  o String tenderId
+}
