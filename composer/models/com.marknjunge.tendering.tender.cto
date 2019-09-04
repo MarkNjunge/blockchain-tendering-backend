@@ -78,7 +78,16 @@ transaction CreateTenderNotice {
   o String openingVenue
   o DateTime openingDate
 }
-
-event TenderNoticeCreated{
+  
+event TenderNoticeCreated {
+  o String tenderId
+}
+  
+transaction WithdrawTender {
+  o String tenderId
+  o String withdrawalReason optional
+}
+  
+event TenderWithdrawn {
   o String tenderId
 }

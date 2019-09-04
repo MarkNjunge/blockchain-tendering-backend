@@ -133,6 +133,24 @@ async function CreateTenderNotice(tx) {
   await tenderNoticeRegistry.add(notice);
 }
 
+/**
+ * Withdraw a tender notice
+ * @param {com.marknjunge.tendering.tender.WithdrawTender} tx Transaction
+ * @transaction
+ */
+async function WithdrawTender(tx) {
+  const tenderNoticeRegistry = await getAssetRegistry(
+    `${assetNS}.TenderNotice`
+  );
+
+  const tender = await tenderNoticeRegistry.get(tx.tenderId);
+
+  tender.withdrawn = true;
+  tender.withdrawalReason = tx.withdrawalReason;
+
+  await tenderNoticeRegistry.update(tender);
+}
+
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
 }
