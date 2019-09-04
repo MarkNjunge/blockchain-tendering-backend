@@ -6,6 +6,7 @@
   "version": "0.0.3",
   "description": "Blockchain based tendering system",
   "scripts": {
+    "build": "cd scripts && ./build.sh",
     "deploy": "cd scripts && ./deploy.sh",
     "upgrade:patch": "npm --no-git-tag-version version patch && cd scripts && ./upgrade.sh",
     "start:rest": "cd scripts && ./create-rest-server.sh",
