@@ -1,4 +1,5 @@
 const participantNS = "com.marknjunge.tendering.participant";
+const assetNS = "com.marknjunge.tendering.tender";
 
 /**
  * Create tendering organization
@@ -98,78 +99,38 @@ async function CreateRegulatoryAuthority(tx) {
 }
 
 /**
- * Withdraw tender
- * @param {com.marknjunge.tendering.tender.WithdrawTender} tx Transaction
+ * Create a tender notice
+ * @param {com.marknjunge.tendering.tender.CreateTenderNotice} tx Transaction
  * @transaction
  */
-async function WithdrawTender(tx) {
-  const NS = "com.marknjunge.tendering";
-
-  tx.tender.withdrawn = true;
-  tx.tender.withdrawalReason = tx.reason;
-
-  const assetRegistry = await getAssetRegistry(`${NS}.tender.TenderDocument`);
-  await assetRegistry.update(tx.tender);
-}
-
-/**
- * Place bid
- * @param {com.marknjunge.tendering.tender.PlaceBid} tx
- * @transaction
- */
-async function PlaceBid(tx) {
-  const NS = "com.marknjunge.tendering";
-
-  // TODO Check if user has a non-withdrawn bid
-  // TODO Check that the document is not withdrawn
-
-  const tenderBidAssetRegistry = await getAssetRegistry(
-    `${NS}.tender.TenderBid`
+async function CreateTenderNotice(tx) {
+  const participantRegistry = await getParticipantRegistry(
+    `${participantNS}.TenderingOrganization`
   );
-  await tenderBidAssetRegistry.add(tx.bid);
-}
+  const tenderNoticeRegistry = await getAssetRegistry(
+    `${assetNS}.TenderNotice`
+  );
+  const factory = getFactory();
 
-/**
- * Withdraw Tender Bid
- * @param {com.marknjunge.tendering.tender.WithdrawTenderBid} tx
- * @transaction
- */
-async function WithdrawTenderBid(tx) {
-  const NS = "com.marknjunge.tendering";
+  const document = factory.newConcept(assetNS, "Document");
+  document.documentUrl = tx.documentUrl;
+  document.documentHash = tx.documentHash;
+  document.datePosted = new Date();
 
-  tx.bid.withdrawn = true;
+  const notice = factory.newResource(assetNS, "TenderNotice", tx.tenderId);
+  notice.organization = await participantRegistry.get(tx.organizationId);
+  notice.title = tx.title;
+  notice.tenderDocument = document;
+  notice.datePublished = new Date();
+  notice.submissionClosingDate = tx.submissionClosingDate;
+  notice.openingVenue = tx.openingVenue;
+  notice.openingDate = tx.openingDate;
 
-  const assetRegistry = await getAssetRegistry(`${NS}.tender.TenderBid`);
-  await assetRegistry.update(tx.bid);
-}
+  const event = factory.newEvent(assetNS, "TenderNoticeCreated");
+  event.tenderId = tx.tenderId;
+  emit(event);
 
-/**
- * Dispute Tender
- * @param {com.marknjunge.tendering.tender.DisputeTender} tx
- * @transaction
- */
-async function DisputeTender(tx) {
-  const NS = "com.marknjunge.tendering";
-
-  tx.tenderResult.disputed = true;
-
-  const assetRegistry = await getAssetRegistry(`${NS}.tender.TenderResult`);
-  await assetRegistry.update(tx.tenderResult);
-}
-
-/**
- * Nullify Tender
- * @param {com.marknjunge.tendering.tender.NullifyTender} tx
- * @transaction
- */
-async function NullifyTender(tx) {
-  const NS = "com.marknjunge.tendering";
-
-  tx.tenderResult.nullified = true;
-  tx.tenderResult.nullificationDocument = tx.nullificationDocument;
-
-  const assetRegistry = await getAssetRegistry(`${NS}.TenderResult`);
-  await assetRegistry.update(tx.tenderResult);
+  await tenderNoticeRegistry.add(notice);
 }
 
 function getRandomInt(max) {

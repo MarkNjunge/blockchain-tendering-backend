@@ -9,18 +9,20 @@ concept TenderAmendment {
 }
 
 concept Document {
-  o String url
-  o String hash
+  o String documentUrl
+  o String documentHash
   o DateTime datePosted
 }
 
-asset TenderDocument identified by tenderId {
+asset TenderNotice identified by tenderId {
   o String tenderId
   --> TenderingOrganization organization
   o String title
-  o Document document
-  o DateTime deadline
-  o DateTime datePosted
+  o Document tenderDocument
+  o DateTime datePublished
+  o DateTime submissionClosingDate
+  o String openingVenue
+  o DateTime openingDate
   o Boolean withdrawn default=false
   o String withdrawalReason optional
   o TenderAmendment[] amendments optional
@@ -28,7 +30,7 @@ asset TenderDocument identified by tenderId {
 
 asset TenderBid identified by bidId{
  o String bidId
- --> TenderDocument tenderDocument
+ --> TenderNotice tenderDocument
  --> TenderBidder bidder
  o String summary
  o DateTime datePosted
@@ -39,14 +41,14 @@ asset TenderBid identified by bidId{
   
 asset TenderOpeningRegister identified by registerId {
   o String registerId 
-  --> TenderDocument tender
+  --> TenderNotice tender
   o Person[] person
   o DateTime date
 }
 
 asset TenderResult identified by resultId {
   o String resultId
-  --> TenderDocument tender
+  --> TenderNotice tender
   --> TenderBid winningBid
   o DateTime datePosted
   o Boolean disputed default=false
@@ -65,26 +67,18 @@ asset TenderRejection identified by rejectionId {
   o RejectionReason reason
   o String reasonNarrative
 }
-
-transaction PlaceBid {
-  o TenderBid bid
-  --> TenderDocument tender
+  
+transaction CreateTenderNotice {
+  o String tenderId
+  o String organizationId
+  o String title
+  o String documentUrl
+  o String documentHash
+  o DateTime submissionClosingDate
+  o String openingVenue
+  o DateTime openingDate
 }
 
-transaction WithdrawTenderBid {
-  --> TenderBid bid
-}
-
-transaction WithdrawTender {
-  --> TenderDocument tender
-  o String reason optional
-}
-
-transaction DisputeTender {
-  --> TenderResult tenderResult
-}
-
-transaction NullifyTender {
-  --> TenderResult tenderResult
-  o Document nullificationDocument
+event TenderNoticeCreated{
+  o String tenderId
 }
