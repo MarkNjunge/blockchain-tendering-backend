@@ -21,7 +21,7 @@ export class ComposerService {
     this.cardStore = NetworkCardStoreManager.getCardStore();
   }
 
-  async verifyCard(card): Promise<String> {
+  async verifyCard(card): Promise<string> {
     try {
       // Verify that the file is a card
       const idCardData = await IdCard.fromArchive(card);
