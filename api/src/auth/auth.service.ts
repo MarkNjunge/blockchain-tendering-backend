@@ -1,13 +1,9 @@
-import {
-  Injectable,
-  HttpStatus,
-  BadRequestException,
-  UnauthorizedException,
-  InternalServerErrorException,
-} from "@nestjs/common";
+import { Injectable, HttpStatus } from "@nestjs/common";
 import { CustomLogger } from "../common/CustomLogger";
 import { ApiResponseDto } from "../common/dto/ApiResponse.dto";
 import { ComposerService } from "../composer/composer.service";
+import { RegistrationDto } from "./dto/Registration.dto";
+import { createParticipant } from "../composer/create-participant";
 
 @Injectable()
 export class AuthService {
@@ -17,8 +13,12 @@ export class AuthService {
     this.logger = new CustomLogger("AuthController");
   }
 
-  async register(): Promise<ApiResponseDto> {
-    return new ApiResponseDto("Not implemented", HttpStatus.NOT_IMPLEMENTED);
+  async register(dto: RegistrationDto): Promise<string> {
+    const connection = await this.composerService.connect(
+      ComposerService.adminCardName,
+    );
+    const adminConnection = await this.composerService.connectAsAdmin();
+    return await createParticipant(connection, adminConnection, dto);
   }
 
   async login(cardFile): Promise<ApiResponseDto> {

@@ -11,14 +11,19 @@ import {
   NetworkCardStoreManager,
 } from "composer-common";
 import { CustomLogger } from "../common/CustomLogger";
+import { AdminConnection } from "composer-admin";
 
 @Injectable()
 export class ComposerService {
-  private cardStore: BusinessNetworkCardStore = NetworkCardStoreManager.getCardStore();
   private logger: CustomLogger;
+  public cardStore: BusinessNetworkCardStore = NetworkCardStoreManager.getCardStore();
+  private cardType = { type: "composer-wallet-filesystem" };
+  public static adminCardName = "admin@tendering";
+  public static participantNS = "com.marknjunge.tendering.participant";
 
   constructor() {
     this.cardStore = NetworkCardStoreManager.getCardStore();
+    this.logger = new CustomLogger("ComposerService");
   }
 
   async verifyCard(card): Promise<string> {
@@ -54,9 +59,14 @@ export class ComposerService {
   }
 
   async connect(cardName): Promise<BusinessNetworkConnection> {
-    const cardType = { type: "composer-wallet-filesystem" };
-    const connection = new BusinessNetworkConnection(cardType);
+    const connection = new BusinessNetworkConnection(this.cardType);
     await connection.connect(cardName);
+    return connection;
+  }
+
+  async connectAsAdmin(): Promise<AdminConnection> {
+    const connection = new AdminConnection(this.cardType);
+    await connection.connect(ComposerService.adminCardName);
     return connection;
   }
 

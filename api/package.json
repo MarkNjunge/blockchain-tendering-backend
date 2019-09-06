@@ -28,6 +28,8 @@
     "@nestjs/swagger": "^3.1.0",
     "class-transformer": "^0.2.2",
     "class-validator": "^0.9.1",
+    "composer-admin": "^0.20.9",
+    "composer-cli": "^0.20.9",
     "composer-client": "^0.20.9",
     "composer-common": "^0.20.9",
     "config": "^3.1.0",

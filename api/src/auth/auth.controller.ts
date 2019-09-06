@@ -5,11 +5,17 @@ import {
   HttpCode,
   Req,
   BadRequestException,
+  Body,
+  Res,
 } from "@nestjs/common";
 import { ApiResponseDto } from "../common/dto/ApiResponse.dto";
 import { ApiResponse, ApiImplicitFile } from "@nestjs/swagger";
 import { CustomLogger } from "src/common/CustomLogger";
 import { AuthService } from "./auth.service";
+import { RegistrationDto, ParticipantType } from "./dto/Registration.dto";
+import * as fs from "fs";
+import { FastifyReply } from "fastify";
+import { ServerResponse } from "http";
 
 @Controller("auth")
 export class AuthController {
@@ -20,10 +26,32 @@ export class AuthController {
   }
 
   @Post("/register")
-  @ApiResponse({ status: HttpStatus.OK, description: "Login was successful" })
-  @HttpCode(501)
-  async register(): Promise<ApiResponseDto> {
-    return this.authService.register();
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: "Registration was successful",
+  })
+  @HttpCode(200)
+  async register(
+    @Body() dto: RegistrationDto,
+    @Res() res: FastifyReply<ServerResponse>,
+  ): Promise<any> {
+    if (
+      dto.participantType === ParticipantType.TENDER_BIDDER &&
+      dto.companyRegNo === undefined
+    ) {
+      throw new BadRequestException(
+        "companyRegNo is required for tender bidders",
+      );
+    }
+
+    const cardFilename = await this.authService.register(dto);
+
+    const file = fs.createReadStream(`./${cardFilename}`);
+    res.header("Content-Disposition", `attachment; filename="${cardFilename}"`);
+    res.send(file);
+
+    fs.copyFileSync(`./${cardFilename}`, `./files/cards/${cardFilename}`);
+    fs.unlinkSync(`./${cardFilename}`); // Delete
   }
 
   @Post("/login")

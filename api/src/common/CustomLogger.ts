@@ -9,7 +9,7 @@ export class CustomLogger implements LoggerService {
   log(message: string, name?: string) {
     winston.info(`[${name || this.name}] ${message}`);
   }
-  error(message: string, trace: string, name?: string) {
+  error(message: string, trace?: string, name?: string) {
     winston.error(`[${name || this.name}] ${message}`);
   }
   warn(message: string, name?: string) {
