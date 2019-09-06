@@ -22,3 +22,6 @@ composer card import --file $ADMIN_CARD
 
 echo "Pinging..."
 composer network ping --card admin@$NETWORK_NAME
+
+echo "Moving admin card to 'cards' directory..."
+mv ./admin@tendering.card ../cards/admin@tendering.card
