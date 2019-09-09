@@ -12,6 +12,7 @@ import {
 } from "composer-common";
 import { CustomLogger } from "../common/CustomLogger";
 import { AdminConnection } from "composer-admin";
+import { CardMetdata } from "./model/CardMetadata";
 
 @Injectable()
 export class ComposerService {
@@ -26,7 +27,7 @@ export class ComposerService {
     this.logger = new CustomLogger("ComposerService");
   }
 
-  async verifyCard(card): Promise<string> {
+  async verifyCard(card): Promise<CardMetdata> {
     try {
       // Verify that the file is a card
       const idCardData = await IdCard.fromArchive(card);
@@ -37,9 +38,15 @@ export class ComposerService {
       );
 
       // Verify that the card exists
-      await this.cardStore.get(idCardName);
+      const c = await this.cardStore.get(idCardName);
+      this.logger.debug(JSON.stringify(c));
 
-      return idCardName;
+      return new CardMetdata(
+        idCardName,
+        c.metadata.userName,
+        c.metadata.participantType,
+        c.metadata.businessNetwork,
+      );
     } catch (error) {
       this.logger.error(error.message, "verifyCard");
 

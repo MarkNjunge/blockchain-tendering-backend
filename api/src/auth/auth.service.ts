@@ -22,10 +22,15 @@ export class AuthService {
   }
 
   async login(cardFile): Promise<ApiResponseDto> {
-    const cardName = await this.composerService.verifyCard(cardFile.data);
-    const connection = await this.composerService.connect(cardName);
+    const cardMetadata = await this.composerService.verifyCard(cardFile.data);
+    const connection = await this.composerService.connect(
+      cardMetadata.cardName,
+    );
     const pingResult = await this.composerService.ping(connection);
-    return new ApiResponseDto("OK", HttpStatus.OK, pingResult);
+    return new ApiResponseDto("OK", HttpStatus.OK, {
+      ping: pingResult,
+      cardMetadata,
+    });
   }
 
   async logout(): Promise<ApiResponseDto> {
