@@ -52,6 +52,7 @@ export async function createParticipant(
     // Create a card for the new particpant
     const metadata = {
       userName: txn.name.replace(/ +/g, ""),
+      participantType: dto.participantType,
       version: 1,
       enrollmentSecret: result.userSecret,
       businessNetwork: "tendering",
