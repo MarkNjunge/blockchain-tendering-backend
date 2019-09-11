@@ -28,21 +28,20 @@ asset TenderNotice identified by tenderId {
   o TenderAmendment[] amendments optional
 }
 
-asset TenderBid identified by bidId{
+asset TenderBid identified by bidId {
  o String bidId
- --> TenderNotice tenderDocument
+ --> TenderNotice tenderNotice
  --> TenderBidder bidder
  o String summary
  o DateTime datePosted
  o Document bidDocument
- o Document[] documentHistory optional
  o Boolean withdrawn default=false
 }
   
 asset TenderOpeningRegister identified by registerId {
   o String registerId 
   --> TenderNotice tender
-  o Person[] person
+  o Person[] committeeMembers
   o DateTime date
 }
 
@@ -63,7 +62,7 @@ enum RejectionReason {
   
 asset TenderRejection identified by rejectionId {
   o String rejectionId 
-  --> TenderBid bidId
+  --> TenderBid bid
   o RejectionReason reason
   o String reasonNarrative
 }
@@ -100,4 +99,42 @@ transaction AmendTender {
   
 event TenderAmended {
   o String tenderId
+}
+
+transaction CreateTenderBid {
+  o String tenderNoticeId
+  o String bidderParticipantId
+  o String bidSummary // [60,5] Contains the total price, tender security
+  o String documentUrl
+  o String documentHash
+}
+
+transaction WithdrawTenderBid {
+  o String bidId
+}
+
+transaction CreateTenderOpeningRegister {
+  o String tenderNoticeId
+  o String[] committeeMemberIds
+}
+
+transaction CreateTenderResult {
+  o String tenderId
+  o String winningBidId
+}
+
+transaction SetTenderResultDisputed {
+  o String resultId
+}
+
+transaction SetTenderResultNullified {
+  o String resultId
+  o String documentUrl optional
+  o String documentHash optional
+}
+
+transaction CreateTenderRejection {
+  o String bidId
+  o RejectionReason reason
+  o String reasonNarrative
 }

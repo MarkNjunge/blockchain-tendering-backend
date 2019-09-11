@@ -26,9 +26,9 @@ participant RegulatoryAuthority extends TenderingParticipant {
 
 participant Person identified by personId {
   o String personId
+  o String idNumber
   o String fullName
-  o Integer idNumber
-  o String phoneNumber
+  o String mobileNumber
 }
 
 transaction CreateTenderingOrganization {
@@ -54,6 +54,12 @@ transaction CreateRegulatoryAuthority {
   o String email
   o String phone
   o String streetAddress
+}
+
+transaction CreatePerson {
+  o String idNumber
+  o String name
+  o String mobileNumber
 }
 
 event ParticipantCreated {

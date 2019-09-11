@@ -178,6 +178,197 @@ async function AmendTender(tx) {
   await tenderNoticeRegistry.update(tender);
 }
 
+/**
+ * Create a person
+ * @param {com.marknjunge.tendering.participant.CreatePerson} tx
+ * @transaction
+ */
+async function CreatePerson(tx) {
+  const registry = await getParticipantRegistry(`${participantNS}.Person`);
+  const factory = getFactory();
+
+  const person = factory.newResource(participantNS, "Person", tx.idNumber);
+  person.fullName = tx.name;
+  person.idNumber = tx.idNumber;
+  person.mobileNumber = tx.mobileNumber;
+
+  await registry.add(person);
+}
+
+/**
+ * Create a tender bid
+ * @param {com.marknjunge.tendering.tender.CreateTenderBid} tx
+ * @transaction
+ */
+async function CreateTenderBid(tx) {
+  const tenderBidRegistry = await getAssetRegistry(`${assetNS}.TenderBid`);
+  const tenderNoticeRegistry = await getAssetRegistry(
+    `${assetNS}.TenderNotice`
+  );
+  const bidderRegistry = await getParticipantRegistry(
+    `${participantNS}.TenderBidder`
+  );
+  const factory = getFactory();
+
+  const document = factory.newConcept(assetNS, "Document");
+  document.documentUrl = tx.documentUrl;
+  document.documentHash = tx.documentHash;
+  document.datePosted = new Date();
+
+  const bidId = `BID#${getRandomInt(999)}`;
+  const bid = factory.newResource(assetNS, "TenderBid", bidId);
+  bid.tenderNotice = await tenderNoticeRegistry.get(tx.tenderNoticeId);
+  bid.bidder = await bidderRegistry.get(tx.bidderParticipantId);
+  bid.summary = tx.bidSummary;
+  bid.datePosted = new Date();
+  bid.bidDocument = document;
+
+  await tenderBidRegistry.add(bid);
+}
+
+/**
+ * Withdraw a tender bid
+ * @param {com.marknjunge.tendering.tender.WithdrawTenderBid} tx
+ * @transaction
+ */
+async function WithdrawTenderBid(tx) {
+  const tenderBidRegistry = await getAssetRegistry(`${assetNS}.TenderBid`);
+
+  const bid = await tenderBidRegistry.get(tx.bidId);
+
+  bid.withdrawn = true;
+
+  await tenderBidRegistry.update(bid);
+}
+
+/**
+ * Create a tender opening register
+ * @param {com.marknjunge.tendering.tender.CreateTenderOpeningRegister} tx
+ * @transaction
+ */
+async function CreateTenderOpeningRegister(tx) {
+  const tenderOpeningRegisterRegistry = await getAssetRegistry(
+    `${assetNS}.TenderOpeningRegister`
+  );
+  const tenderNoticeRegistry = await getAssetRegistry(
+    `${assetNS}.TenderNotice`
+  );
+  const personRegistry = await getParticipantRegistry(
+    `${participantNS}.Person`
+  );
+  const factory = getFactory();
+
+  const registerId = `REGISTER#${getRandomInt(999)}`;
+  const register = factory.newResource(
+    assetNS,
+    "TenderOpeningRegister",
+    registerId
+  );
+  register.tender = await tenderNoticeRegistry.get(tx.tenderNoticeId);
+  const persons = [];
+  await asyncForEach(tx.committeeMemberIds, async id => {
+    const person = await personRegistry.get(id);
+    persons.push(person);
+  });
+  register.committeeMembers = persons;
+  register.date = new Date();
+
+  await tenderOpeningRegisterRegistry.add(register);
+}
+
+/**
+ * Create a tender result
+ * @param {com.marknjunge.tendering.tender.CreateTenderResult} tx
+ * @transaction
+ */
+async function CreateTenderResult(tx) {
+  const tenderNoticeRegistry = await getAssetRegistry(
+    `${assetNS}.TenderNotice`
+  );
+  const tenderBidRegistry = await getAssetRegistry(`${assetNS}.TenderBid`);
+  const tenderResultRegistry = await getAssetRegistry(
+    `${assetNS}.TenderResult`
+  );
+  const factory = getFactory();
+
+  const resultId = `RESULT#${getRandomInt(999)}`;
+  const result = factory.newResource(assetNS, "TenderResult", resultId);
+  result.tender = await tenderNoticeRegistry.get(tx.tenderId);
+  result.winningBid = await tenderBidRegistry.get(tx.winningBidId);
+  result.datePosted = new Date();
+
+  await tenderResultRegistry.add(result);
+}
+
+/**
+ * Set a tender to be disputed
+ * @param {com.marknjunge.tendering.tender.SetTenderResultDisputed} tx
+ * @transaction
+ */
+async function SetTenderResultDisputed(tx) {
+  const tenderResultRegistry = await getAssetRegistry(
+    `${assetNS}.TenderResult`
+  );
+
+  const result = await tenderResultRegistry.get(tx.resultId);
+  result.disputed = true;
+
+  await tenderResultRegistry.update(result);
+}
+
+/**
+ * Set a tender result to be nullified
+ * @param {com.marknjunge.tendering.tender.SetTenderResultNullified} tx
+ * @transaction
+ */
+async function SetTenderResultNullified(tx) {
+  const tenderResultRegistry = await getAssetRegistry(
+    `${assetNS}.TenderResult`
+  );
+  const factory = getFactory();
+
+  const result = await tenderResultRegistry.get(tx.resultId);
+  result.nullified = true;
+
+  if (tx.documentUrl) {
+    const document = factory.newConcept(assetNS, "Document");
+    document.documentUrl = tx.documentUrl;
+    document.documentHash = tx.documentHash;
+    document.datePosted = new Date();
+
+    result.nullificationDocument = document;
+  }
+
+  await tenderResultRegistry.update(result);
+}
+
+/**
+ * Create a tender rejection
+ * @param {com.marknjunge.tendering.tender.CreateTenderRejection} tx
+ * @transaction
+ */
+async function CreateTenderRejection(tx) {
+  const tenderBidRegistry = await getAssetRegistry(`${assetNS}.TenderBid`);
+  const tenderRejectionRegistry = await getAssetRegistry(
+    `${assetNS}.TenderRejection`
+  );
+  const factory = getFactory();
+
+  const rejetionId = `REJECTION#${getRandomInt(999)}`;
+  const rejection = factory.newResource(assetNS, "TenderRejection", rejetionId);
+  rejection.bid = await tenderBidRegistry.get(tx.bidId);
+  rejection.reason = tx.reason;
+  rejection.reasonNarrative = tx.reasonNarrative;
+
+  await tenderRejectionRegistry.add(rejection);
+}
+
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
+}
+
+async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
 }
