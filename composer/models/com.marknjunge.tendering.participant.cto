@@ -12,23 +12,11 @@ abstract participant TenderingParticipant identified by participantId{
   o Contact contact
 }
 
+/**
+ * TENDERING ORGANIZATION
+ */
 participant TenderingOrganization extends TenderingParticipant {
  
-}
-
-participant TenderBidder extends TenderingParticipant{
- o String companyRegNo
-}
-
-participant RegulatoryAuthority extends TenderingParticipant {
- 
-}
-
-participant Person identified by personId {
-  o String personId
-  o String idNumber
-  o String fullName
-  o String mobileNumber
 }
 
 transaction CreateTenderingOrganization {
@@ -37,6 +25,13 @@ transaction CreateTenderingOrganization {
   o String email
   o String phone
   o String streetAddress
+}
+
+/**
+ * TENDERING BIDDER
+ */
+participant TenderBidder extends TenderingParticipant{
+  o String companyRegNo
 }
 
 transaction CreateTenderBidder {
@@ -48,12 +43,29 @@ transaction CreateTenderBidder {
   o String streetAddress
 }
 
+/**
+ * REGULATORY AUTHORITY
+ */
+participant RegulatoryAuthority extends TenderingParticipant {
+ 
+}
+
 transaction CreateRegulatoryAuthority {
   o String participantId optional
   o String name
   o String email
   o String phone
   o String streetAddress
+}
+
+/**
+ * PERSON
+ */
+participant Person identified by personId {
+  o String personId
+  o String idNumber
+  o String fullName
+  o String mobileNumber
 }
 
 transaction CreatePerson {

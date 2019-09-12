@@ -2,13 +2,16 @@ namespace com.marknjunge.tendering.tender
 
 import com.marknjunge.tendering.participant.*
 
-concept TenderAmendment {
+concept Document {
   o String documentUrl
   o String documentHash
   o DateTime datePosted
 }
 
-concept Document {
+/**
+ * TENDER NOTICE
+ */
+concept TenderAmendment {
   o String documentUrl
   o String documentHash
   o DateTime datePosted
@@ -28,45 +31,6 @@ asset TenderNotice identified by tenderId {
   o TenderAmendment[] amendments optional
 }
 
-asset TenderBid identified by bidId {
- o String bidId
- --> TenderNotice tenderNotice
- --> TenderBidder bidder
- o String summary
- o DateTime datePosted
- o Document bidDocument
- o Boolean withdrawn default=false
-}
-  
-asset TenderOpeningRegister identified by registerId {
-  o String registerId 
-  --> TenderNotice tender
-  o Person[] committeeMembers
-  o DateTime date
-}
-
-asset TenderResult identified by resultId {
-  o String resultId
-  --> TenderNotice tender
-  --> TenderBid winningBid
-  o DateTime datePosted
-  o Boolean disputed default=false
-  o Boolean nullified default=false
-  o Document nullificationDocument optional
-} 
-
-enum RejectionReason {
-  o UNRESPONSIVE
-  o OTHER
-}
-  
-asset TenderRejection identified by rejectionId {
-  o String rejectionId 
-  --> TenderBid bid
-  o RejectionReason reason
-  o String reasonNarrative
-}
-  
 transaction CreateTenderNotice {
   o String tenderId
   o String organizationId
@@ -81,7 +45,7 @@ transaction CreateTenderNotice {
 event TenderNoticeCreated {
   o String tenderId
 }
-  
+
 transaction WithdrawTender {
   o String tenderId
   o String withdrawalReason optional
@@ -90,7 +54,7 @@ transaction WithdrawTender {
 event TenderWithdrawn {
   o String tenderId
 }
-  
+
 transaction AmendTender {
   o String tenderId
   o String documentUrl
@@ -99,6 +63,19 @@ transaction AmendTender {
   
 event TenderAmended {
   o String tenderId
+}
+
+/**
+ * TENDER BID
+ */
+asset TenderBid identified by bidId {
+ o String bidId
+ --> TenderNotice tenderNotice
+ --> TenderBidder bidder
+ o String summary
+ o DateTime datePosted
+ o Document bidDocument
+ o Boolean withdrawn default=false
 }
 
 transaction CreateTenderBid {
@@ -112,10 +89,33 @@ transaction CreateTenderBid {
 transaction WithdrawTenderBid {
   o String bidId
 }
+  
+/**
+ * TENDER OPENING REGISTER
+ */
+asset TenderOpeningRegister identified by registerId {
+  o String registerId 
+  --> TenderNotice tender
+  o Person[] committeeMembers
+  o DateTime date
+}
 
 transaction CreateTenderOpeningRegister {
   o String tenderNoticeId
   o String[] committeeMemberIds
+}
+
+/**
+ * TENDER RESULT
+ */
+asset TenderResult identified by resultId {
+  o String resultId
+  --> TenderNotice tender
+  --> TenderBid winningBid
+  o DateTime datePosted
+  o Boolean disputed default=false
+  o Boolean nullified default=false
+  o Document nullificationDocument optional
 }
 
 transaction CreateTenderResult {
@@ -131,6 +131,21 @@ transaction SetTenderResultNullified {
   o String resultId
   o String documentUrl optional
   o String documentHash optional
+}
+
+/**
+ * TENDER REJECTION
+ */
+enum RejectionReason {
+  o UNRESPONSIVE
+  o OTHER
+}
+  
+asset TenderRejection identified by rejectionId {
+  o String rejectionId 
+  --> TenderBid bid
+  o RejectionReason reason
+  o String reasonNarrative
 }
 
 transaction CreateTenderRejection {
