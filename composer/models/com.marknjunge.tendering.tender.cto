@@ -3,7 +3,7 @@ namespace com.marknjunge.tendering.tender
 import com.marknjunge.tendering.participant.*
 
 concept Document {
-  o String documentUrl
+  o String documentRef
   o String documentHash
   o DateTime datePosted
 }
@@ -12,7 +12,7 @@ concept Document {
  * TENDER NOTICE
  */
 concept TenderAmendment {
-  o String documentUrl
+  o String documentRef
   o String documentHash
   o DateTime datePosted
 }
@@ -43,7 +43,7 @@ transaction CreateTenderNotice {
   o String tenderId
   o String organizationId
   o String title
-  o String documentUrl
+  o String documentRef
   o String documentHash
   o DateTime submissionClosingDate
   o String openingVenue
@@ -65,7 +65,7 @@ event TenderWithdrawn {
 
 transaction AmendTender {
   o String tenderId
-  o String documentUrl
+  o String documentRef
   o String documentHash
 }
   
@@ -90,7 +90,7 @@ transaction CreateTenderBid {
   o String tenderNoticeId
   o String bidderParticipantId
   o String bidSummary // [60,5] Contains the total price, tender security
-  o String documentUrl
+  o String documentRef
   o String documentHash
 }
 
@@ -137,7 +137,7 @@ transaction SetTenderResultDisputed {
 
 transaction SetTenderResultNullified {
   o String resultId
-  o String documentUrl optional
+  o String documentRef optional
   o String documentHash optional
 }
 

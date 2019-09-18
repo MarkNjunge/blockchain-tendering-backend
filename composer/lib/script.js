@@ -119,7 +119,7 @@ async function CreateTenderNotice(tx) {
   const factory = getFactory();
 
   const document = factory.newConcept(assetNS, "Document");
-  document.documentUrl = tx.documentUrl;
+  document.documentRef = tx.documentRef;
   document.documentHash = tx.documentHash;
   document.datePosted = new Date();
 
@@ -170,7 +170,7 @@ async function AmendTender(tx) {
   const factory = getFactory();
 
   const amendment = factory.newConcept(assetNS, "Document");
-  amendment.documentUrl = tx.documentUrl;
+  amendment.documentRef = tx.documentRef;
   amendment.documentHash = tx.documentHash;
   amendment.datePosted = new Date();
 
@@ -218,7 +218,7 @@ async function CreateTenderBid(tx) {
   const factory = getFactory();
 
   const document = factory.newConcept(assetNS, "Document");
-  document.documentUrl = tx.documentUrl;
+  document.documentRef = tx.documentRef;
   document.documentHash = tx.documentHash;
   document.datePosted = new Date();
 
@@ -347,9 +347,9 @@ async function SetTenderResultNullified(tx) {
   const result = await tenderResultRegistry.get(tx.resultId);
   result.nullified = true;
 
-  if (tx.documentUrl) {
+  if (tx.documentRef) {
     const document = factory.newConcept(assetNS, "Document");
-    document.documentUrl = tx.documentUrl;
+    document.documentRef = tx.documentRef;
     document.documentHash = tx.documentHash;
     document.datePosted = new Date();
 
