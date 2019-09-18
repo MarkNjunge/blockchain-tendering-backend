@@ -224,7 +224,11 @@ async function CreateTenderBid(tx) {
 
   const bidId = `BID#${getRandomInt(999)}`;
   const bid = factory.newResource(assetNS, "TenderBid", bidId);
-  bid.tenderNotice = await tenderNoticeRegistry.get(tx.tenderNoticeId);
+  const tenderNotice = await tenderNoticeRegistry.get(tx.tenderNoticeId);
+  if (tenderNotice.withdrawn) {
+    throw new Error("Selected TenderNotice is withdrawn.");
+  }
+  bid.tenderNotice = tenderNotice;
   bid.bidder = await bidderRegistry.get(tx.bidderParticipantId);
   bid.summary = tx.bidSummary;
   bid.datePosted = new Date();
