@@ -17,7 +17,9 @@ async function CreateTenderingOrganization(tx) {
   contact.phone = tx.phone;
   contact.streetAddress = tx.streetAddress;
 
-  const participantId = tx.participantId || `TORG#${getRandomInt(9999)}`;
+  const participantId =
+    tx.participantId ||
+    `${tx.name.replace(/ +/g, "").toLowerCase()}#${getRandomInt(9999)}`;
   const organization = factory.newResource(
     participantNS,
     "TenderingOrganization",
@@ -49,7 +51,9 @@ async function CreateTenderBidder(tx) {
   contact.phone = tx.phone;
   contact.streetAddress = tx.streetAddress;
 
-  const participantId = tx.participantId || `BIDDER#${getRandomInt(9999)}`;
+  const participantId =
+    tx.participantId ||
+    `${tx.name.replace(/ +/g, "").toLowerCase()}#${getRandomInt(9999)}`;
   const bidder = factory.newResource(
     participantNS,
     "TenderBidder",
@@ -82,7 +86,9 @@ async function CreateRegulatoryAuthority(tx) {
   contact.phone = tx.phone;
   contact.streetAddress = tx.streetAddress;
 
-  const participantId = tx.participantId || `REGAUTH#${getRandomInt(9999)}`;
+  const participantId =
+    tx.participantId ||
+    `${tx.name.replace(/ +/g, "").toLowerCase()}#${getRandomInt(9999)}`;
   const authority = factory.newResource(
     participantNS,
     "RegulatoryAuthority",
