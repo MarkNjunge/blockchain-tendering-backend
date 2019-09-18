@@ -4,7 +4,7 @@ A blockchain based tendering system.
 
 Submitted as a 4th year project to [Strathmore University](https://www.strathmore.edu/).
 
-Built using [Hyperledger Composer](https://www.hyperledger.org/projects/composer).
+Built using [Hyperledger](https://www.hyperledger.org/)([Composer](https://www.hyperledger.org/projects/composer)).
 
 ## Installation
 
@@ -43,6 +43,16 @@ Use `yarn admin:clean-docker all` to remove all, omit to remove all non-latest.
 #### admin:create-participant
 
 Creates a participant, as well as an identity and a card to be used for authentication.
+
+#### admin:inspect-blocks
+
+Logs the details of the blocks on the blockchain.
+
+### api
+
+#### api:start:dev
+
+Start a REST server in dev mode.
 
 ### composer
 
