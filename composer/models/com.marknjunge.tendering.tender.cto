@@ -17,6 +17,13 @@ concept TenderAmendment {
   o DateTime datePosted
 }
 
+enum NoticeStatus {
+  o PUBLISHED
+  o CLOSED
+  o AWARDED
+  o WITHDRAWN
+}
+
 asset TenderNotice identified by tenderId {
   o String tenderId
   --> TenderingOrganization organization
@@ -26,6 +33,7 @@ asset TenderNotice identified by tenderId {
   o DateTime submissionClosingDate
   o String openingVenue
   o DateTime openingDate
+  o NoticeStatus status default="PUBLISHED"
   o Boolean withdrawn default=false
   o String withdrawalReason optional
   o TenderAmendment[] amendments optional

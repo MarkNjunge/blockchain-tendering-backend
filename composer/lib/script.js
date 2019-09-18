@@ -146,6 +146,7 @@ async function WithdrawTender(tx) {
   const tender = await tenderNoticeRegistry.get(tx.tenderId);
 
   tender.withdrawn = true;
+  tender.status = "WITHDRAWN";
   tender.withdrawalReason = tx.withdrawalReason;
 
   await tenderNoticeRegistry.update(tender);
@@ -264,7 +265,8 @@ async function CreateTenderOpeningRegister(tx) {
     "TenderOpeningRegister",
     registerId
   );
-  register.tender = await tenderNoticeRegistry.get(tx.tenderNoticeId);
+  const tender = await tenderNoticeRegistry.get(tx.tenderNoticeId);
+  register.tender = tender;
   const persons = [];
   await asyncForEach(tx.committeeMemberIds, async id => {
     const person = await personRegistry.get(id);
@@ -272,6 +274,10 @@ async function CreateTenderOpeningRegister(tx) {
   });
   register.committeeMembers = persons;
   register.date = new Date();
+
+  // Set tender to closed
+  tender.status = "CLOSED";
+  await tenderNoticeRegistry.update(tender);
 
   await tenderOpeningRegisterRegistry.add(register);
 }
@@ -293,9 +299,14 @@ async function CreateTenderResult(tx) {
 
   const resultId = `RESULT#${getRandomInt(999)}`;
   const result = factory.newResource(assetNS, "TenderResult", resultId);
-  result.tender = await tenderNoticeRegistry.get(tx.tenderId);
+  const tender = await tenderNoticeRegistry.get(tx.tenderId);
+  result.tender = tender;
   result.winningBid = await tenderBidRegistry.get(tx.winningBidId);
   result.datePosted = new Date();
+
+  // Set tender to closed
+  tender.status = "AWARDED";
+  await tenderNoticeRegistry.update(tender);
 
   await tenderResultRegistry.add(result);
 }
