@@ -13,6 +13,7 @@
     "composer:build": "yarn --cwd composer build",
     "composer:deploy": "yarn --cwd composer deploy",
     "composer:upgrade:patch": "yarn --cwd composer upgrade:patch",
-    "composer:start:rest": "yarn --cwd composer start:rest"
+    "composer:start:rest": "yarn --cwd composer start:rest",
+    "composer:start": "yarn --cwd composer start"
   }
 }
