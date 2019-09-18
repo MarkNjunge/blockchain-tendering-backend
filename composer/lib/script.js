@@ -307,7 +307,22 @@ async function CreateTenderResult(tx) {
   const result = factory.newResource(assetNS, "TenderResult", resultId);
   const tender = await tenderNoticeRegistry.get(tx.tenderId);
   result.tender = tender;
-  result.winningBid = await tenderBidRegistry.get(tx.winningBidId);
+  const bid = await tenderBidRegistry.get(tx.winningBidId);
+
+  // Ensure "winning" bid is not withdrawn
+  if (bid.withdrawn) {
+    throw new Error("Selected bid is withdrawn.");
+  }
+
+  // Ensure bid was placed on this tender
+  const tenderOfBid = await tenderNoticeRegistry.get(
+    bid.tenderNotice.$identifier
+  );
+  if (tenderOfBid.tenderId != tx.tenderId) {
+    throw new Error("Selected bid was not placed on this tender.");
+  }
+
+  result.winningBid = bid;
   result.datePosted = new Date();
 
   // Set tender to closed
@@ -373,7 +388,12 @@ async function CreateTenderRejection(tx) {
 
   const rejetionId = `REJECTION#${getRandomInt(999)}`;
   const rejection = factory.newResource(assetNS, "TenderRejection", rejetionId);
-  rejection.bid = await tenderBidRegistry.get(tx.bidId);
+  const bid = await tenderBidRegistry.get(tx.bidId);
+  // Ensure bid was not withdrawn
+  if (bid.withdrawn) {
+    throw new Error("Selected bid is withdrawn.");
+  }
+  rejection.bid = bid;
   rejection.reason = tx.reason;
   rejection.reasonNarrative = tx.reasonNarrative;
 
