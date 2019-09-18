@@ -113,14 +113,16 @@ async function getBlocksProgressively(connection) {
 
   // Get current block number
   console.log(`Current block number: ${currentBlock.header.number}`);
-  fullBlockState.push(`Current block number: ${currentBlock.header.number}`);
+  fullBlockState.push(`Current block number:\n\t${currentBlock.header.number}`);
 
   // Get current block hash
   console.log(
-    `Current block hash: ${currentBlockInfo.currentBlockHash.toString("hex")}`
+    `Current block hash:${currentBlockInfo.currentBlockHash.toString("hex")}`
   );
   fullBlockState.push(
-    `Current block hash: ${currentBlockInfo.currentBlockHash.toString("hex")}`
+    `Current block hash:\n\t${currentBlockInfo.currentBlockHash.toString(
+      "hex"
+    )}`
   );
 
   // Get preceding block hash
@@ -130,7 +132,7 @@ async function getBlocksProgressively(connection) {
     )}`
   );
   fullBlockState.push(
-    `Preceding block hash: ${currentBlockInfo.previousBlockHash.toString(
+    `Preceding block hash:\n\t${currentBlockInfo.previousBlockHash.toString(
       "hex"
     )}`
   );
@@ -138,7 +140,7 @@ async function getBlocksProgressively(connection) {
   // Get preceding block data
   const currentBlockDecoded = decodeBlock(currentBlock);
   fullBlockState.push(
-    `Block data: ${JSON.stringify(
+    `Block data:\n\t${JSON.stringify(
       currentBlockDecoded.data.payload.data.results
     )}`
   );
@@ -151,20 +153,23 @@ async function getBlocksProgressively(connection) {
     // Get current block number
     const block = await channel.queryBlock(precedingBlockNumber);
     console.log(`Current Block number: ${block.header.number}`);
-    fullBlockState.push(`Current Block number: ${block.header.number}`);
+    fullBlockState.push(`Current Block number:\n\t${block.header.number}`);
 
     // Get current block hash
     const blockHash = calculateBlockHash(block.header);
     console.log(`Current Block hash: ${blockHash}`);
-    fullBlockState.push(`Current Block hash: ${blockHash}`);
+    fullBlockState.push(`Current Block hash:\n\t${blockHash}`);
 
     // Get preceding block hash
     console.log(`Preceding block hash: ${block.header.previous_hash}`);
+    fullBlockState.push(
+      `Preceding block hash:\n\t${block.header.previous_hash}`
+    );
 
     // Get block data
     const blockDecoded = decodeBlock(block);
     fullBlockState.push(
-      `Block data: ${JSON.stringify(blockDecoded.data.payload.data.results)}`
+      `Block data:\n\t${JSON.stringify(blockDecoded.data.payload.data.results)}`
     );
 
     precedingBlockNumber -= 1;
