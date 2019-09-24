@@ -33,11 +33,23 @@ export class AuthService {
     const connection = await this.composerService.connect(
       cardMetadata.cardName,
     );
-    await this.composerService.ping(connection);
+    const pingResult = await this.composerService.ping(connection);
+
+    const participantType = pingResult.participant
+      .split("com.marknjunge.tendering.participant.")[1]
+      .split("#")[0];
+    const participantId = pingResult.participant.split(
+      `${participantType}#`,
+    )[1];
 
     // Save session card in db
     const sessionId = generateSessionId();
-    const session = new SessionEntity(sessionId, cardMetadata.cardName);
+    const session = new SessionEntity(
+      sessionId,
+      cardMetadata.cardName,
+      participantId,
+      participantType,
+    );
     await this.sessionRepository.save(session);
 
     return sessionId;
