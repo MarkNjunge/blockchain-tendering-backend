@@ -2,8 +2,8 @@ import {
   Injectable,
   CanActivate,
   ExecutionContext,
-  UnauthorizedException,
-  ForbiddenException,
+  HttpException,
+  HttpStatus,
 } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { IncomingMessage } from "http";
@@ -12,6 +12,7 @@ import { SessionEntity } from "../../db/entities/session.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CustomLogger } from "../CustomLogger";
+import { ResponseCodes } from "../ResponseCodes";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -35,26 +36,33 @@ export class AuthGuard implements CanActivate {
   async validateRequest(
     request: FastifyRequest<IncomingMessage>,
   ): Promise<boolean> {
-    try {
-      const sessionCookie = request.headers.cookie
-        .split("session=")[1]
-        .split(";")[0];
-
-      if (!sessionCookie) {
-        throw new UnauthorizedException("No 'session' cookie found");
-      }
-
-      const session = await this.sessionRepository.findOne({
-        sessionId: sessionCookie,
-      });
-      if (!session) {
-        throw new ForbiddenException("Invalid session id");
-      }
-
-      request.params.session = session;
-    } catch (e) {
-      throw new UnauthorizedException("No 'session' cookie found");
+    const sessionCookiePart1 = request.headers.cookie.split("session=")[1];
+    if (!sessionCookiePart1) {
+      throw new HttpException(
+        {
+          message: "No 'session' cookie found",
+          responseCode: ResponseCodes.NO_SESSION_PROVIDED,
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
     }
+
+    const sessionCookie = sessionCookiePart1.split(";")[0];
+    const session = await this.sessionRepository.findOne({
+      sessionId: sessionCookie,
+    });
+
+    if (!session) {
+      throw new HttpException(
+        {
+          message: "Invalid session id",
+          responseCode: ResponseCodes.INVALID_SESSION,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    request.params.session = session;
 
     return true;
   }

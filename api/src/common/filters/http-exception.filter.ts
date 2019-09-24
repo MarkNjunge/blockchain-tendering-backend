@@ -7,6 +7,8 @@ import {
 import { FastifyReply, FastifyRequest } from "fastify";
 import { ServerResponse, IncomingMessage } from "http";
 import { CustomLogger } from "../CustomLogger";
+import { ResponseCodes } from "../ResponseCodes";
+import { ApiResponseDto } from "../dto/ApiResponse.dto";
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -28,15 +30,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
       .split(" ")[0];
     const message = exception.message.message || exception.message;
     const meta = exception.message.meta;
-    const logMessage = {
+    const responseCode =
+      exception.message.responseCode || ResponseCodes.UNSPECIFIED;
+    const responseMessage = new ApiResponseDto(
       status,
       message,
+      responseCode,
       meta,
-    };
-    this.logger.error(JSON.stringify(logMessage), null, stackTop);
+    );
+    this.logger.error(JSON.stringify(responseMessage), null, stackTop);
 
-    response.status(status).send({
-      ...logMessage,
-    });
+    response.status(status).send(responseMessage);
   }
 }

@@ -1,19 +1,27 @@
 import { ApiModelProperty } from "@nestjs/swagger";
-import { HttpStatus } from "@nestjs/common";
 
 export class ApiResponseDto {
   @ApiModelProperty()
-  status: number;
+  httpStatus: number;
 
   @ApiModelProperty()
   message: string;
 
   @ApiModelProperty()
+  responseCode: string;
+
+  @ApiModelProperty()
   meta: any;
 
-  constructor(message: string, status: number = HttpStatus.OK, meta = null) {
+  constructor(
+    httpStatus: number,
+    message: string,
+    responseCode: string,
+    meta?: any,
+  ) {
+    this.httpStatus = httpStatus;
     this.message = message;
-    this.status = status;
+    this.responseCode = responseCode;
     this.meta = meta;
   }
 }

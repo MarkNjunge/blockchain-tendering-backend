@@ -23,6 +23,7 @@ import * as fs from "fs";
 import { FastifyReply } from "fastify";
 import { ServerResponse } from "http";
 import { AuthGuard } from "../common/guards/auth.guard";
+import { ResponseCodes } from "../common/ResponseCodes";
 
 @Controller("auth")
 export class AuthController {
@@ -93,7 +94,13 @@ export class AuthController {
       `session=${sessionId}; Expires=${sessionExpiry}; HttpOnly; path=/`,
     );
 
-    res.send(new ApiResponseDto("Login successful"));
+    res.send(
+      new ApiResponseDto(
+        HttpStatus.OK,
+        "Login successful",
+        ResponseCodes.LOGIN_SUCCESS,
+      ),
+    );
   }
 
   @Post("/logout")
@@ -101,7 +108,11 @@ export class AuthController {
   @ApiImplicitHeader({ name: "sessionId", required: true })
   async logout(@Req() req): Promise<ApiResponseDto> {
     await this.authService.logout(req.headers.sessionid);
-    return new ApiResponseDto("Logged out successfully", HttpStatus.OK);
+    return new ApiResponseDto(
+      HttpStatus.OK,
+      "Logout successfull",
+      ResponseCodes.LOGOUT_SUCCESS,
+    );
   }
 
   @Get("/ping")
