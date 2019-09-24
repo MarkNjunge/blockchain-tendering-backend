@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ComposerService } from "../composer/composer.service";
 import { CustomLogger } from "../common/CustomLogger";
 import { SessionEntity } from "src/db/entities/session.entity";
-import { ProfileDto, ContactDto } from "./dto/profile.dto";
+import { ProfileDto } from "./dto/profile.dto";
 
 @Injectable()
 export class ProfileService {
