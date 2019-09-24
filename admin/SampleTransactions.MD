@@ -23,6 +23,7 @@
   "title": "SUPPLY AND DELIVERY OF PHARMACEUTICALS",
   "documentRef": "BGM-CNTY-PREQ-09-2019-2021.pdf",
   "documentHash": "347EB3CCDB13B83D75E87740AA90A3DE933E080A10E55565C125280E0BAD4B80",
+  "requiredDocuments":["BID_BOND", "MANUFACTURER_CERTIFICATE"],
   "submissionClosingDate": "2019-10-10T09:00:00.560Z",
   "openingVenue": "Former municipal county hall",
   "openingDate": "2019-10-10T09:00:00.560Z"
@@ -52,7 +53,29 @@
   "bidderParticipantId": "Sentric#1237",
   "bidSummary": "Bid for tender BGM/CNTY/PREQ/09/2019-2021 valued at Ksh. 1,000,000",
   "documentRef": "Tender Bid.pdf",
-  "documentHash": "688787d8ff144c502c7f5cffaafe2cc588d86079f9de88304c26b0cb99ce91c6"
+  "documentHash": "688787d8ff144c502c7f5cffaafe2cc588d86079f9de88304c26b0cb99ce91c6",
+  "requiredDocuments": [
+    {
+      "$class": "com.marknjunge.tendering.tender.ExtraDocument",
+      "key": "BID_BOND",
+      "document": {
+        "$class": "com.marknjunge.tendering.tender.Document",
+        "documentRef": "Nostrud nisi excepteur.",
+        "documentHash": "Dolore mollit ut.",
+        "datePosted": "2019-09-24T07:31:14.172Z"
+      }
+    },
+    {
+      "$class": "com.marknjunge.tendering.tender.ExtraDocument",
+      "key": "MANUFACTURER_CERTIFICATE",
+      "document": {
+        "$class": "com.marknjunge.tendering.tender.Document",
+        "documentRef": "Nostrud nisi excepteur.",
+        "documentHash": "Dolore mollit ut.",
+        "datePosted": "2019-09-24T07:31:14.172Z"
+      }
+    }
+  ]
 }
 ```
 

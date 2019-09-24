@@ -29,6 +29,7 @@ asset TenderNotice identified by tenderId {
   --> TenderingOrganization organization
   o String title
   o Document tenderDocument
+  o String[] requiredDocuments
   o DateTime datePublished
   o DateTime submissionClosingDate
   o String openingVenue
@@ -45,6 +46,7 @@ transaction CreateTenderNotice {
   o String title
   o String documentRef
   o String documentHash
+  o String[] requiredDocuments
   o DateTime submissionClosingDate
   o String openingVenue
   o DateTime openingDate
@@ -76,6 +78,11 @@ event TenderAmended {
 /**
  * TENDER BID
  */
+concept ExtraDocument {
+ o String key
+ o Document document
+}
+  
 asset TenderBid identified by bidId {
  o String bidId
  --> TenderNotice tenderNotice
@@ -83,6 +90,7 @@ asset TenderBid identified by bidId {
  o String summary
  o DateTime datePosted
  o Document bidDocument
+ o ExtraDocument[] requiredDocuments
  o Boolean withdrawn default=false
 }
 
@@ -92,6 +100,7 @@ transaction CreateTenderBid {
   o String bidSummary // [60,5] Contains the total price, tender security
   o String documentRef
   o String documentHash
+  o ExtraDocument[] requiredDocuments
 }
 
 transaction WithdrawTenderBid {
