@@ -47,8 +47,8 @@ export class AuthService {
     await this.sessionRepository.delete({ sessionId });
   }
 
-  async ping(sessionId: string): Promise<any> {
-    const session = await this.sessionRepository.findOne({ sessionId });
+  async ping(session: SessionEntity): Promise<any> {
+    this.logger.debug(`Connecting using card: ${session.cardName}`);
     const connection = await this.composerService.connect(session.cardName);
     const pingResult = await this.composerService.ping(connection);
 

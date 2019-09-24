@@ -8,6 +8,7 @@ import {
   Body,
   Res,
   Get,
+  UseGuards,
 } from "@nestjs/common";
 import { ApiResponseDto } from "../common/dto/ApiResponse.dto";
 import {
@@ -21,6 +22,7 @@ import { RegistrationDto, ParticipantType } from "./dto/Registration.dto";
 import * as fs from "fs";
 import { FastifyReply } from "fastify";
 import { ServerResponse } from "http";
+import { AuthGuard } from "../common/guards/auth.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -107,8 +109,8 @@ export class AuthController {
     status: HttpStatus.OK,
     description: "Authentication is valid",
   })
-  @ApiImplicitHeader({ name: "sessionId", required: true })
+  @UseGuards(AuthGuard)
   async ping(@Req() req): Promise<any> {
-    return await this.authService.ping(req.headers.sessionid);
+    return await this.authService.ping(req.params.session);
   }
 }

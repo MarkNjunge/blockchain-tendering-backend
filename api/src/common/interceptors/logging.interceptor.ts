@@ -30,7 +30,8 @@ export class LoggingInterceptor implements NestInterceptor {
       .pipe(
         tap(() =>
           this.logger.log(
-            `${method} ${url} - ${response.res.statusCode} - ${Date.now() - now}ms`,
+            `${method} ${url} - ${response.res.statusCode} - ${Date.now() -
+              now}ms`,
             context.getClass().name,
           ),
         ),
