@@ -56,24 +56,16 @@
   "documentHash": "688787d8ff144c502c7f5cffaafe2cc588d86079f9de88304c26b0cb99ce91c6",
   "requiredDocuments": [
     {
-      "$class": "com.marknjunge.tendering.tender.ExtraDocument",
+      "$class": "com.marknjunge.tendering.tender.ExtraDocumentCreate",
       "key": "BID_BOND",
-      "document": {
-        "$class": "com.marknjunge.tendering.tender.Document",
-        "documentRef": "Nostrud nisi excepteur.",
-        "documentHash": "Dolore mollit ut.",
-        "datePosted": "2019-09-24T07:31:14.172Z"
-      }
+      "documentRef": "Bid bond.pdf",
+      "documentHash": "688787d8ff144c502c7f5cffaafe2cc588d86079f9de88304c26b0cb99ce91c6"
     },
     {
-      "$class": "com.marknjunge.tendering.tender.ExtraDocument",
+      "$class": "com.marknjunge.tendering.tender.ExtraDocumentCreate",
       "key": "MANUFACTURER_CERTIFICATE",
-      "document": {
-        "$class": "com.marknjunge.tendering.tender.Document",
-        "documentRef": "Nostrud nisi excepteur.",
-        "documentHash": "Dolore mollit ut.",
-        "datePosted": "2019-09-24T07:31:14.172Z"
-      }
+      "documentRef": "Manufacturer Certificate.pdf",
+      "documentHash": "688787d8ff144c502c7f5cffaafe2cc588d86079f9de88304c26b0cb99ce91c6"
     }
   ]
 }

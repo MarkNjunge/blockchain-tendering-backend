@@ -82,6 +82,12 @@ concept ExtraDocument {
  o String key
  o Document document
 }
+
+concept ExtraDocumentCreate {
+  o String key
+  o String documentRef
+  o String documentHash
+}
   
 asset TenderBid identified by bidId {
  o String bidId
@@ -100,7 +106,7 @@ transaction CreateTenderBid {
   o String bidSummary // [60,5] Contains the total price, tender security
   o String documentRef
   o String documentHash
-  o ExtraDocument[] requiredDocuments
+  o ExtraDocumentCreate[] requiredDocuments
 }
 
 transaction WithdrawTenderBid {

@@ -230,17 +230,25 @@ async function CreateTenderBid(tx) {
     throw new Error("Selected TenderNotice is withdrawn.");
   }
 
+  const requiredDocuments = [];
   // Assert that all required documents have been provided
   tenderNotice.requiredDocuments.forEach(name => {
     const doc = tx.requiredDocuments.filter(x => x.key == name)[0];
     if (!doc) {
       throw new Error(`Required document ${name} has not been provided`);
     }
+
+    const newDoc = factory.newConcept(assetNS, "Document");
+    newDoc.documentRef = doc.documentRef;
+    newDoc.documentHash = doc.documentHash;
+    newDoc.datePosted = new Date();
+
+    requiredDocuments.push(doc);
   });
 
   bid.tenderNotice = tenderNotice;
   bid.bidder = await bidderRegistry.get(tx.bidderParticipantId);
-  bid.requiredDocuments = tx.requiredDocuments;
+  bid.requiredDocuments = requiredDocuments;
   bid.summary = tx.bidSummary;
   bid.datePosted = new Date();
   bid.bidDocument = document;
