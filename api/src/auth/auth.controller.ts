@@ -90,7 +90,7 @@ export class AuthController {
     const sessionExpiry = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365); // 1 year
     res.header(
       "Set-Cookie",
-      `session=${sessionId}; Expires=${sessionExpiry}; HttpOnly `,
+      `session=${sessionId}; Expires=${sessionExpiry}; HttpOnly; path=/`,
     );
 
     res.send(new ApiResponseDto("Login successful"));
