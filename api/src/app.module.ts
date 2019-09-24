@@ -7,6 +7,8 @@ import { ComposerService } from "./composer/composer.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { config } from "./common/Config";
 import { SessionEntity } from "./db/entities/session.entity";
+import { ProfileController } from "./profile/profile.controller";
+import { ProfileService } from "./profile/profile.service";
 
 @Module({
   imports: [
@@ -21,7 +23,7 @@ import { SessionEntity } from "./db/entities/session.entity";
     }),
     TypeOrmModule.forFeature([SessionEntity]),
   ],
-  controllers: [AppController, AuthController],
-  providers: [AppService, AuthService, ComposerService],
+  controllers: [AppController, AuthController, ProfileController],
+  providers: [AppService, AuthService, ComposerService, ProfileService],
 })
 export class AppModule {}

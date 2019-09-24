@@ -4,7 +4,10 @@ import {
   UnauthorizedException,
   InternalServerErrorException,
 } from "@nestjs/common";
-import { BusinessNetworkConnection } from "composer-client";
+import {
+  BusinessNetworkConnection,
+  ParticipantRegistry,
+} from "composer-client";
 import {
   BusinessNetworkCardStore,
   IdCard,
@@ -83,5 +86,14 @@ export class ComposerService {
 
   async disconnect(connection: BusinessNetworkConnection) {
     await connection.disconnect();
+  }
+
+  async getParticipantRegistry(
+    connection: BusinessNetworkConnection,
+    participantType: string,
+  ): Promise<ParticipantRegistry> {
+    return await connection.getParticipantRegistry(
+      `${ComposerService.participantNS}.${participantType}`,
+    );
   }
 }
