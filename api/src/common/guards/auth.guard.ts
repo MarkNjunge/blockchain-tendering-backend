@@ -8,7 +8,6 @@ import {
 import { Observable } from "rxjs";
 import { IncomingMessage } from "http";
 import { FastifyRequest } from "fastify";
-import { ComposerService } from "../../composer/composer.service";
 import { SessionEntity } from "../../db/entities/session.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -19,7 +18,6 @@ export class AuthGuard implements CanActivate {
   logger: CustomLogger;
 
   constructor(
-    private readonly composerService: ComposerService,
     @InjectRepository(SessionEntity)
     private readonly sessionRepository: Repository<SessionEntity>,
   ) {
