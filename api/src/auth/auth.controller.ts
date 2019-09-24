@@ -7,9 +7,14 @@ import {
   BadRequestException,
   Body,
   Res,
+  Get,
 } from "@nestjs/common";
 import { ApiResponseDto } from "../common/dto/ApiResponse.dto";
-import { ApiResponse, ApiImplicitFile } from "@nestjs/swagger";
+import {
+  ApiResponse,
+  ApiImplicitFile,
+  ApiImplicitHeader,
+} from "@nestjs/swagger";
 import { CustomLogger } from "src/common/CustomLogger";
 import { AuthService } from "./auth.service";
 import { RegistrationDto, ParticipantType } from "./dto/Registration.dto";
@@ -70,19 +75,40 @@ export class AuthController {
     status: HttpStatus.UNAUTHORIZED,
     description: "The card is not in the network.",
   })
-  async login(@Req() req): Promise<ApiResponseDto> {
+  async login(
+    @Req() req,
+    @Res() res: FastifyReply<ServerResponse>,
+  ): Promise<any> {
     const cardFile = req.raw.files.card;
     if (!cardFile) {
       throw new BadRequestException("A business network card is required!");
     }
 
-    return this.authService.login(cardFile);
+    const sessionId = await this.authService.login(cardFile);
+    const sessionExpiry = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365); // 1 year
+    res.header(
+      "Set-Cookie",
+      `session=${sessionId}; Expires=${sessionExpiry}; HttpOnly `,
+    );
+
+    res.send(new ApiResponseDto("Login successful"));
   }
 
   @Post("/logout")
   @ApiResponse({ status: HttpStatus.OK, description: "Login was successful" })
-  @HttpCode(501)
-  async logout(): Promise<ApiResponseDto> {
-    return this.authService.logout();
+  @ApiImplicitHeader({ name: "sessionId", required: true })
+  async logout(@Req() req): Promise<ApiResponseDto> {
+    await this.authService.logout(req.headers.sessionid);
+    return new ApiResponseDto("Logged out successfully", HttpStatus.OK);
+  }
+
+  @Get("/ping")
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: "Authentication is valid",
+  })
+  @ApiImplicitHeader({ name: "sessionId", required: true })
+  async ping(@Req() req): Promise<any> {
+    return await this.authService.ping(req.headers.sessionid);
   }
 }

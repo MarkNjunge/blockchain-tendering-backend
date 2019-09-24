@@ -13,6 +13,8 @@ export interface Config {
   corsHeaders: string;
   validatorForbidUnknown: boolean;
   loggerTimestampFormat: string;
+  dbUrl: string;
+  dbSSL: string;
 }
 
 export const config: Config = configPackage;

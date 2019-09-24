@@ -8,5 +8,7 @@
   "corsMethods": "*",
   "corsHeaders": "*",
   "validatorForbidUnknown": true,
-  "loggerTimestampFormat": "YYYY-MM-DD HH:mm:ss.SSS"
+  "loggerTimestampFormat": "YYYY-MM-DD HH:mm:ss.SSS",
+  "dbUrl": "postgres://username:password@host:port/database",
+  "dbSSL": false
 }
