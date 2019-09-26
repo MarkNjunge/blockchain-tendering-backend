@@ -35,9 +35,18 @@ export class AuthService {
     );
     const pingResult = await this.composerService.ping(connection);
 
-    const participantType = pingResult.participant
-      .split("com.marknjunge.tendering.participant.")[1]
-      .split("#")[0];
+    let participantType;
+    if (
+      pingResult.participant.startsWith(
+        "org.hyperledger.composer.system.NetworkAdmin",
+      )
+    ) {
+      participantType = "NetworkAdmin";
+    } else {
+      participantType = pingResult.participant
+        .split("com.marknjunge.tendering.participant.")[1]
+        .split("#")[0];
+    }
     const participantId = pingResult.participant.split(
       `${participantType}#`,
     )[1];
