@@ -3,6 +3,8 @@ import {
   BadRequestException,
   UnauthorizedException,
   InternalServerErrorException,
+  HttpException,
+  HttpStatus,
 } from "@nestjs/common";
 import {
   BusinessNetworkConnection,
@@ -16,6 +18,7 @@ import {
 import { CustomLogger } from "../common/CustomLogger";
 import { AdminConnection } from "composer-admin";
 import { CardMetdata } from "./model/CardMetadata";
+import { ResponseCodes } from "../common/ResponseCodes";
 
 @Injectable()
 export class ComposerService {
@@ -51,14 +54,24 @@ export class ComposerService {
         c.metadata.businessNetwork,
       );
     } catch (error) {
-      this.logger.error(error.message, "verifyCard");
+      this.logger.error(error.message, "", "verifyCard");
 
       if (error.message.includes("is this a zip file")) {
-        throw new BadRequestException(
-          "The file uploaded is not a valid business network card.",
+        throw new HttpException(
+          {
+            message: "The file uploaded is not a valid business network card.",
+            responseCode: ResponseCodes.INVALID_CARD_FILE,
+          },
+          HttpStatus.BAD_REQUEST,
         );
       } else if (error.message.includes("Card not found")) {
-        throw new UnauthorizedException("The card is not in the network.");
+        throw new HttpException(
+          {
+            message: "The card is not in the network.",
+            responseCode: ResponseCodes.CARD_NOT_FOUND,
+          },
+          HttpStatus.UNAUTHORIZED,
+        );
       } else {
         throw new InternalServerErrorException({
           message: "Unable to login",
