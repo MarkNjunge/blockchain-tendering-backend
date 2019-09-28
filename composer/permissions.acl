@@ -1,7 +1,15 @@
-rule ParticipantsReadNetwork {
+rule AllParticipantsCanAccessAllAssets {
+    description: "Grant participants complete access to all assets"
+    participant: "com.marknjunge.tendering.participant.**"
+    operation: ALL
+    resource: "com.marknjunge.tendering.tender.**"
+    action: ALLOW
+}
+
+rule ParticipantsFullAccessNetwork {
     description: "Grant participants read access to system resources"
     participant: "com.marknjunge.tendering.participant.**"
-    operation: READ
+    operation: ALL
     resource: "org.hyperledger.composer.system.**"
     action: ALLOW
 }
