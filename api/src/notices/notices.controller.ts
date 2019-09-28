@@ -64,7 +64,7 @@ export class NoticesController {
     dto.requiredDocuments = dto.requiredDocuments.map(doc =>
       doc
         .trim()
-        .replace(/ |-/, "_")
+        .replace(/ +/g, "_")
         .toUpperCase(),
     );
 
@@ -73,18 +73,16 @@ export class NoticesController {
       .update(req.raw.files.document.data)
       .digest("hex");
     const session: SessionEntity = req.params.session;
-    const docRef = `${session.participantId}#${dto.title.replace(/ +/g, "_")}#${
-      req.raw.files.document.name
-    }`;
+    const docRef = `NOTICE|${session.participantId}|${dto.id}|${req.raw.files.document.name}`;
 
-    const doc = new Document(
+    const noticeDoc = new Document(
       req.raw.files.document.name,
       docRef,
       docHash,
       req.raw.files.document.data,
     );
 
-    await this.noticesSerivce.create(req.params.session, dto, doc);
+    await this.noticesSerivce.create(req.params.session, dto, noticeDoc);
 
     return new ApiResponseDto(
       HttpStatus.CREATED,
