@@ -9,10 +9,10 @@ import { config } from "./common/Config";
 import { SessionEntity } from "./db/entities/session.entity";
 import { ProfileController } from "./profile/profile.controller";
 import { ProfileService } from "./profile/profile.service";
-import { NoticesController } from './notices/notices.controller';
-import { NoticesService } from './notices/notices.service';
-import { BidsController } from './bids/bids.controller';
-import { BidsService } from './bids/bids.service';
+import { NoticesController } from "./notices/notices.controller";
+import { NoticesService } from "./notices/notices.service";
+import { BidsController } from "./bids/bids.controller";
+import { BidsService } from "./bids/bids.service";
 
 @Module({
   imports: [

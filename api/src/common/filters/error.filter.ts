@@ -22,13 +22,14 @@ export class ErrorFilter implements ExceptionFilter {
     const response = ctx.getResponse<FastifyReply<ServerResponse>>();
     const request = ctx.getRequest<FastifyRequest<IncomingMessage>>();
 
-    var stackTop = "";
+    let stackTop = "";
     if (error.stack) {
       try {
         stackTop = error.stack
           .split("\n")[1]
           .split("at ")[1]
           .split(" ")[0];
+        // tslint:disable-next-line:no-empty
       } catch (e) {}
     }
     const message = error.message;
