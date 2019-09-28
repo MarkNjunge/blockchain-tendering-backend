@@ -8,4 +8,6 @@ export class ResponseCodes {
   public static CARD_NOT_FOUND = "cardNotFound";
   public static NOTICE_CREATED = "noticeCreated";
   public static NOTICE_NOT_FOUND = "noticeNotFound";
+  public static BID_CREATED = "bidCreated";
+  public static REQUIRED_DOCUMENT_MISSING = "requiredDocumentMissing";
 }

@@ -8,5 +8,5 @@ export class DocumentDto {
   documentHash: string;
 
   @ApiModelProperty()
-  datePosted: Date;
+  datePosted: string;
 }
