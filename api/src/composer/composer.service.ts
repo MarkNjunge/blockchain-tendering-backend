@@ -27,6 +27,7 @@ export class ComposerService {
   private cardType = { type: "composer-wallet-filesystem" };
   public static adminCardName = "admin@tendering";
   public static participantNS = "com.marknjunge.tendering.participant";
+  public static tenderNS = "com.marknjunge.tendering.tender";
 
   constructor() {
     this.cardStore = NetworkCardStoreManager.getCardStore();

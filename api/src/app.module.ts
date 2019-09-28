@@ -9,6 +9,8 @@ import { config } from "./common/Config";
 import { SessionEntity } from "./db/entities/session.entity";
 import { ProfileController } from "./profile/profile.controller";
 import { ProfileService } from "./profile/profile.service";
+import { NoticesController } from './notices/notices.controller';
+import { NoticesService } from './notices/notices.service';
 
 @Module({
   imports: [
@@ -23,7 +25,7 @@ import { ProfileService } from "./profile/profile.service";
     }),
     TypeOrmModule.forFeature([SessionEntity]),
   ],
-  controllers: [AppController, AuthController, ProfileController],
-  providers: [AppService, AuthService, ComposerService, ProfileService],
+  controllers: [AppController, AuthController, ProfileController, NoticesController],
+  providers: [AppService, AuthService, ComposerService, ProfileService, NoticesService],
 })
 export class AppModule {}

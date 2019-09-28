@@ -6,4 +6,6 @@ export class ResponseCodes {
   public static LOGOUT_SUCCESS = "logoutSuccess";
   public static INVALID_CARD_FILE = "invalidCardFile";
   public static CARD_NOT_FOUND = "cardNotFound";
+  public static NOTICE_CREATED = "noticeCreated";
+  public static NOTICE_NOT_FOUND = "noticeNotFound";
 }

@@ -20,7 +20,7 @@ import { SessionEntity } from "../db/entities/session.entity";
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
-  @Get("/s")
+  @Get("/")
   @ApiResponse({
     status: HttpStatus.OK,
     description: "Returns the current user's information",
