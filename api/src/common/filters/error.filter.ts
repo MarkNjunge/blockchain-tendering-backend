@@ -22,10 +22,15 @@ export class ErrorFilter implements ExceptionFilter {
     const response = ctx.getResponse<FastifyReply<ServerResponse>>();
     const request = ctx.getRequest<FastifyRequest<IncomingMessage>>();
 
-    const stackTop = error.stack
-      .split("\n")[1]
-      .split("at ")[1]
-      .split(" ")[0];
+    var stackTop = "";
+    if (error.stack) {
+      try {
+        stackTop = error.stack
+          .split("\n")[1]
+          .split("at ")[1]
+          .split(" ")[0];
+      } catch (e) {}
+    }
     const message = error.message;
     const logMessage = {
       status: HttpStatus.INTERNAL_SERVER_ERROR,
