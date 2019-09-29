@@ -22,6 +22,7 @@ import { SessionEntity } from "../db/entities/session.entity";
 import { ApiResponseDto } from "../common/dto/ApiResponse.dto";
 import { ResponseCodes } from "../common/ResponseCodes";
 import { TenderNoticeDto } from "./dto/TenderNotice.dto";
+import { getRandomInt } from "../common/utils";
 
 @Controller("notices")
 @UseGuards(AuthGuard)
@@ -80,7 +81,7 @@ export class NoticesController {
       .update(req.raw.files.document.data)
       .digest("hex");
     const session: SessionEntity = req.params.session;
-    const docRef = `NOTICE|${session.participantId}|${dto.id}|${req.raw.files.document.name}`;
+    const docRef = `NOTICE|${session.participantId}|${dto.id}|${getRandomInt()}|${req.raw.files.document.name}`;
 
     const noticeDoc = new Document(
       req.raw.files.document.name,

@@ -12,6 +12,7 @@ import { ExtraDocumentDto } from "./dto/ExtraDocumentDto";
 import { ApiResponseDto } from "../common/dto/ApiResponse.dto";
 import { ResponseCodes } from "../common/ResponseCodes";
 import { TenderBidDto } from "./dto/TenderBid.dto";
+import { getRandomInt } from "../common/utils";
 
 @Controller("bids")
 @UseGuards(AuthGuard)
@@ -57,7 +58,7 @@ export class BidsController {
       .createHash("sha256")
       .update(req.raw.files.bid.data)
       .digest("hex");
-    const bidDocRef = `BID|${dto.tenderId}|${session.participantId}|${req.raw.files.bid.name}`;
+    const bidDocRef = `BID|${dto.tenderId}|${session.participantId}|${getRandomInt()}|${req.raw.files.bid.name}`;
     const bidDocument = new Document(
       req.raw.files.bid.name,
       bidDocRef,
@@ -71,7 +72,7 @@ export class BidsController {
         return;
       }
       const file = req.raw.files[k];
-      const docRef = `BID_EXTRA|${dto.tenderId}|${session.participantId}|${k}|${req.raw.files.bid.name}`;
+      const docRef = `BID_EXTRA|${dto.tenderId}|${session.participantId}|${k}|${getRandomInt()}|${req.raw.files.bid.name}`;
       const docHash = crypto
         .createHash("sha256")
         .update(file.data)
