@@ -5,7 +5,7 @@ import {
   UseGuards,
   HttpStatus,
   Get,
-  Param,
+  Param, Query,
 } from "@nestjs/common";
 import { CreateTenderNoticeDto } from "./dto/CreateTenderNotice.dto";
 import { NoticesService } from "./notices.service";
@@ -14,7 +14,7 @@ import {
   ApiImplicitFile,
   ApiImplicitBody,
   ApiConsumes,
-  ApiResponse,
+  ApiResponse, ApiImplicitQuery,
 } from "@nestjs/swagger";
 import { Document } from "../common/document";
 import * as crypto from "crypto";
@@ -30,8 +30,15 @@ export class NoticesController {
 
   @Get()
   @ApiResponse({ status: 200, type: TenderNoticeDto, isArray: true })
-  async findAll(@Req() req): Promise<TenderNoticeDto[]> {
-    return this.noticesSerivce.findAll(req.params.session);
+  @ApiImplicitQuery({ name: "organizationId", required: false })
+  async findAll(@Param("session") session, @Query() query): Promise<TenderNoticeDto[]> {
+    const organizationId = query.organizationId;
+
+    if (organizationId) {
+      return this.noticesSerivce.findByOrganization(session, organizationId);
+    } else {
+      return this.noticesSerivce.findAll(session);
+    }
   }
 
   @Get(":id")

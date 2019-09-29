@@ -56,6 +56,16 @@ export class NoticesService {
     return tenderNoticeRegistry.getAll();
   }
 
+  async findByOrganization(session: SessionEntity, organizationId: string): Promise<TenderNoticeDto[]> {
+    this.logger.debug(`Fetching notices for TenderingOrganization ${organizationId}`);
+    const connection = await this.composerService.connect(session.cardName);
+    const organization = `resource:com.marknjunge.tendering.participant.TenderingOrganization#${organizationId}`;
+
+    const statement = "SELECT com.marknjunge.tendering.tender.TenderNotice WHERE (organization == _$organization)";
+    const query = await connection.buildQuery(statement);
+    return connection.query(query, { organization });
+  }
+
   async findById(session: SessionEntity, id: string): Promise<TenderNoticeDto> {
     const connection = await this.composerService.connect(session.cardName);
     const tenderNoticeRegistry: AssetRegistry = await connection.getAssetRegistry(
