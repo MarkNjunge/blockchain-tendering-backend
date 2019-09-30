@@ -5,7 +5,7 @@ import {
   UseGuards,
   HttpStatus,
   Get,
-  Param, Query,
+  Param, Query, Body, HttpCode,
 } from "@nestjs/common";
 import { CreateTenderNoticeDto } from "./dto/CreateTenderNotice.dto";
 import { NoticesService } from "./notices.service";
@@ -23,6 +23,8 @@ import { ApiResponseDto } from "../common/dto/ApiResponse.dto";
 import { ResponseCodes } from "../common/ResponseCodes";
 import { TenderNoticeDto } from "./dto/TenderNotice.dto";
 import { getRandomInt } from "../common/utils";
+import { SetTenderResultDto } from "./dto/SetTenderResult.dto";
+import { TenderResultDto } from "./dto/TenderResult.dto";
 
 @Controller("notices")
 @UseGuards(AuthGuard)
@@ -49,6 +51,13 @@ export class NoticesController {
     @Param("id") id: string,
   ): Promise<TenderNoticeDto> {
     return this.noticesSerivce.findById(req.params.session, id);
+  }
+
+  @Get("/:id/result")
+  @ApiResponse({ type: TenderResultDto, status: HttpStatus.OK })
+  @ApiResponse({ type: ApiResponseDto, status: HttpStatus.NOT_FOUND })
+  async getResultForNotice(@Param("session") session, @Param("id") id: string): Promise<TenderResultDto> {
+    return this.noticesSerivce.getNoticeResult(session, id);
   }
 
   @Post("/create")
@@ -97,5 +106,32 @@ export class NoticesController {
       "TenderNotice created",
       ResponseCodes.NOTICE_CREATED,
     );
+  }
+
+  @Post("/:id/result")
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({ type: ApiResponseDto, status: HttpStatus.OK })
+  async setNoticeResult(@Param("session") session, @Param("id") id: string, @Body() dto: SetTenderResultDto): Promise<ApiResponseDto> {
+    await this.noticesSerivce.setNoticeResult(session, id, dto);
+
+    return new ApiResponseDto(HttpStatus.OK, "TenderResult set", ResponseCodes.RESULT_SET);
+  }
+
+  @Post("/:id/result/dispute")
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({ type: ApiResponseDto, status: HttpStatus.OK })
+  async disputeNoticeResult(@Param("session") session, @Param("id") id: string): Promise<ApiResponseDto> {
+    await this.noticesSerivce.disputeTenderResult(session, id);
+
+    return new ApiResponseDto(HttpStatus.OK, "TenderResult disputed", ResponseCodes.NOTICE_DISPUTED);
+  }
+
+  @Post("/:id/result/nullify")
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({ type: ApiResponseDto, status: HttpStatus.OK })
+  async nullifyTenderResult(@Param("session") session, @Param("id") id: string): Promise<ApiResponseDto> {
+    await this.noticesSerivce.nullifyTenderResult(session, id);
+
+    return new ApiResponseDto(HttpStatus.OK, "TenderResult nullified", ResponseCodes.NOTICE_NULLIFIED);
   }
 }

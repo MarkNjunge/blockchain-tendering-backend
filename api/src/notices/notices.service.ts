@@ -8,6 +8,8 @@ import { Document } from "../common/document";
 import { AssetRegistry } from "composer-client";
 import { TenderNoticeDto } from "./dto/TenderNotice.dto";
 import { ResponseCodes } from "src/common/ResponseCodes";
+import { SetTenderResultDto } from "./dto/SetTenderResult.dto";
+import { TenderResultDto } from "./dto/TenderResult.dto";
 
 @Injectable()
 export class NoticesService {
@@ -73,8 +75,7 @@ export class NoticesService {
     );
 
     try {
-      const notice = await tenderNoticeRegistry.get(id);
-      return notice;
+      return await tenderNoticeRegistry.get(id);
     } catch (e) {
       if (e.message.includes("does not exist")) {
         throw new HttpException(
@@ -88,5 +89,71 @@ export class NoticesService {
         throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
       }
     }
+  }
+
+  async getNoticeResult(session: SessionEntity, tenderId: string): Promise<TenderResultDto> {
+    this.logger.debug(`Fetching result for TenderingNotice ${tenderId}`);
+    const connection = await this.composerService.connect(session.cardName);
+    const tender = `resource:com.marknjunge.tendering.tender.TenderNotice#${tenderId}`;
+
+    const statement = "SELECT com.marknjunge.tendering.tender.TenderResult WHERE (tender == _$tender)";
+    const query = await connection.buildQuery(statement);
+    const results = await connection.query(query, { tender });
+
+    if (results[0]) {
+      return results[0];
+    } else {
+      throw new HttpException({ message: "No result for tender", responseCode: ResponseCodes.NO_RESULT_FOR_NOTICE }, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  async setNoticeResult(session: SessionEntity, tenderId: string, dto: SetTenderResultDto) {
+    const connection = await this.composerService.connect(session.cardName);
+    const network: BusinessNetworkDefinition = connection.getBusinessNetwork();
+    const factory: Factory = network.getFactory();
+
+    this.logger.debug(`Setting TenderBid ${dto.winningBid} as winning bid for TenderNotice ${tenderId}`);
+    const txn = factory.newTransaction(ComposerService.tenderNS, "CreateTenderResult");
+    txn.setPropertyValue("tenderId", tenderId);
+    txn.setPropertyValue("winningBidId", dto.winningBid);
+
+    await connection.submitTransaction(txn);
+    this.logger.debug("TenderResult set");
+
+    await connection.disconnect();
+  }
+
+  async disputeTenderResult(session: SessionEntity, tenderId: string) {
+    const connection = await this.composerService.connect(session.cardName);
+    const network: BusinessNetworkDefinition = connection.getBusinessNetwork();
+    const factory: Factory = network.getFactory();
+
+    const result = await this.getNoticeResult(session, tenderId);
+
+    this.logger.debug(`Disputing TenderResult ${result.resultId}`);
+    const txn = factory.newTransaction(ComposerService.tenderNS, "SetTenderResultDisputed");
+    txn.setPropertyValue("resultId", result.resultId);
+
+    await connection.submitTransaction(txn);
+    this.logger.debug("TenderResult disputed");
+
+    await connection.disconnect();
+  }
+
+  async nullifyTenderResult(session: SessionEntity, tenderId: string) {
+    const connection = await this.composerService.connect(session.cardName);
+    const network: BusinessNetworkDefinition = connection.getBusinessNetwork();
+    const factory: Factory = network.getFactory();
+
+    const result = await this.getNoticeResult(session, tenderId);
+
+    this.logger.debug(`Nullifying TenderResult ${result.resultId}`);
+    const txn = factory.newTransaction(ComposerService.tenderNS, "SetTenderResultNullified");
+    txn.setPropertyValue("resultId", result.resultId);
+
+    await connection.submitTransaction(txn);
+    this.logger.debug("TenderResult nullified");
+
+    await connection.disconnect();
   }
 }

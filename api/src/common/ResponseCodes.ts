@@ -10,4 +10,8 @@ export class ResponseCodes {
   public static NOTICE_NOT_FOUND = "noticeNotFound";
   public static BID_CREATED = "bidCreated";
   public static REQUIRED_DOCUMENT_MISSING = "requiredDocumentMissing";
+  public static RESULT_SET = "noticeResultSet";
+  public static NO_RESULT_FOR_NOTICE = "noResultForNotice";
+  public static NOTICE_DISPUTED = "noticeDisputed";
+  public static NOTICE_NULLIFIED = "noticeNullified";
 }
