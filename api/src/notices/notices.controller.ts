@@ -29,7 +29,7 @@ import { TenderResultDto } from "./dto/TenderResult.dto";
 @Controller("notices")
 @UseGuards(AuthGuard)
 export class NoticesController {
-  constructor(private readonly noticesSerivce: NoticesService) {}
+  constructor(private readonly noticesService: NoticesService) {}
 
   @Get()
   @ApiResponse({ status: 200, type: TenderNoticeDto, isArray: true })
@@ -38,9 +38,9 @@ export class NoticesController {
     const organizationId = query.organizationId;
 
     if (organizationId) {
-      return this.noticesSerivce.findByOrganization(session, organizationId);
+      return this.noticesService.findByOrganization(session, organizationId);
     } else {
-      return this.noticesSerivce.findAll(session);
+      return this.noticesService.findAll(session);
     }
   }
 
@@ -50,14 +50,14 @@ export class NoticesController {
     @Req() req,
     @Param("id") id: string,
   ): Promise<TenderNoticeDto> {
-    return this.noticesSerivce.findById(req.params.session, id);
+    return this.noticesService.findById(req.params.session, id);
   }
 
   @Get("/:id/result")
   @ApiResponse({ type: TenderResultDto, status: HttpStatus.OK })
   @ApiResponse({ type: ApiResponseDto, status: HttpStatus.NOT_FOUND })
   async getResultForNotice(@Param("session") session, @Param("id") id: string): Promise<TenderResultDto> {
-    return this.noticesSerivce.getNoticeResult(session, id);
+    return this.noticesService.getNoticeResult(session, id);
   }
 
   @Post("/create")
@@ -99,7 +99,7 @@ export class NoticesController {
       req.raw.files.document.data,
     );
 
-    await this.noticesSerivce.create(req.params.session, dto, noticeDoc);
+    await this.noticesService.create(req.params.session, dto, noticeDoc);
 
     return new ApiResponseDto(
       HttpStatus.CREATED,
@@ -112,7 +112,7 @@ export class NoticesController {
   @HttpCode(HttpStatus.OK)
   @ApiResponse({ type: ApiResponseDto, status: HttpStatus.OK })
   async setNoticeResult(@Param("session") session, @Param("id") id: string, @Body() dto: SetTenderResultDto): Promise<ApiResponseDto> {
-    await this.noticesSerivce.setNoticeResult(session, id, dto);
+    await this.noticesService.setNoticeResult(session, id, dto);
 
     return new ApiResponseDto(HttpStatus.OK, "TenderResult set", ResponseCodes.RESULT_SET);
   }
@@ -121,7 +121,7 @@ export class NoticesController {
   @HttpCode(HttpStatus.OK)
   @ApiResponse({ type: ApiResponseDto, status: HttpStatus.OK })
   async disputeNoticeResult(@Param("session") session, @Param("id") id: string): Promise<ApiResponseDto> {
-    await this.noticesSerivce.disputeTenderResult(session, id);
+    await this.noticesService.disputeTenderResult(session, id);
 
     return new ApiResponseDto(HttpStatus.OK, "TenderResult disputed", ResponseCodes.NOTICE_DISPUTED);
   }
@@ -130,7 +130,7 @@ export class NoticesController {
   @HttpCode(HttpStatus.OK)
   @ApiResponse({ type: ApiResponseDto, status: HttpStatus.OK })
   async nullifyTenderResult(@Param("session") session, @Param("id") id: string): Promise<ApiResponseDto> {
-    await this.noticesSerivce.nullifyTenderResult(session, id);
+    await this.noticesService.nullifyTenderResult(session, id);
 
     return new ApiResponseDto(HttpStatus.OK, "TenderResult nullified", ResponseCodes.NOTICE_NULLIFIED);
   }
