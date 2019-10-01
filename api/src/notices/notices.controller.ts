@@ -60,7 +60,7 @@ export class NoticesController {
     return this.noticesService.getNoticeResult(session, id);
   }
 
-  @Post("/create")
+  @Post("/")
   @ApiConsumes("multipart/form-data")
   @ApiImplicitFile({
     name: "document",
