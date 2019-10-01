@@ -1,4 +1,4 @@
-import { Controller, Get, HttpStatus, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req, UseGuards } from "@nestjs/common";
 import { BidsService } from "./bids.service";
 import { IncomingMessage } from "http";
 import { FastifyRequest } from "fastify";
@@ -13,6 +13,7 @@ import { ApiResponseDto } from "../common/dto/ApiResponse.dto";
 import { ResponseCodes } from "../common/ResponseCodes";
 import { TenderBidDto } from "./dto/TenderBid.dto";
 import { getRandomInt } from "../common/utils";
+import { CreateRejectionDto } from "./dto/CreateRejection.dto";
 
 @Controller("bids")
 @UseGuards(AuthGuard)
@@ -87,6 +88,14 @@ export class BidsController {
       "TenderBid created",
       ResponseCodes.BID_CREATED,
     );
+  }
+
+  @Post("/:id/reject")
+  @HttpCode(HttpStatus.OK)
+  async reject(@Param("session") session, @Param("id") id: string, @Body() dto: CreateRejectionDto) {
+    await this.bidService.reject(session, id, dto);
+
+    return new ApiResponseDto(HttpStatus.OK, "TenderBid rejected", ResponseCodes.TENDER_BID_REJECTED);
   }
 
 }

@@ -9,6 +9,7 @@ import { Document } from "../common/document";
 import { ExtraDocumentDto } from "./dto/ExtraDocumentDto";
 import { ResponseCodes } from "../common/ResponseCodes";
 import { TenderBidDto } from "./dto/TenderBid.dto";
+import { CreateRejectionDto } from "./dto/CreateRejection.dto";
 
 @Injectable()
 export class BidsService {
@@ -81,6 +82,32 @@ export class BidsService {
       const msg = e.message.split("transaction returned with failure: Error: ")[1];
       if (e.message.includes("has not been provided")) {
         throw new HttpException({ message: msg, responseCode: ResponseCodes.REQUIRED_DOCUMENT_MISSING }, HttpStatus.BAD_REQUEST);
+      } else {
+        throw new HttpException(msg, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+  }
+
+  async reject(session: SessionEntity, bidId: string, dto: CreateRejectionDto) {
+    const connection = await this.composerService.connect(session.cardName);
+    const network: BusinessNetworkDefinition = connection.getBusinessNetwork();
+    const factory: Factory = network.getFactory();
+
+    this.logger.debug(`Rejecting TenderBid ${bidId} with reason ${dto.reason}`);
+    const txn = factory.newTransaction(ComposerService.tenderNS, "CreateTenderRejection");
+    txn.setPropertyValue("bidId", bidId);
+    txn.setPropertyValue("reason", dto.reason);
+    txn.setPropertyValue("reasonNarrative", dto.reasonNarrative);
+
+    try {
+      await connection.submitTransaction(txn);
+      this.logger.debug("TenderRejection completed");
+
+      await connection.disconnect();
+    } catch (e) {
+      const msg = e.message.split("transaction returned with failure: Error: ")[1];
+      if (e.message.includes("does not exist")) {
+        throw new HttpException({ message: msg, responseCode: ResponseCodes.TENDER_BID_NOT_FOUND }, HttpStatus.NOT_FOUND);
       } else {
         throw new HttpException(msg, HttpStatus.INTERNAL_SERVER_ERROR);
       }
