@@ -14,7 +14,7 @@ import { ApiResponseDto } from "../common/dto/ApiResponse.dto";
 import {
   ApiResponse,
   ApiImplicitFile,
-  ApiImplicitHeader,
+  ApiImplicitHeader, ApiOperation,
 } from "@nestjs/swagger";
 import { CustomLogger } from "src/common/CustomLogger";
 import { AuthService } from "./auth.service";
@@ -34,6 +34,7 @@ export class AuthController {
   }
 
   @Post("/register")
+  @ApiOperation({ title: "Create a new participant" })
   @ApiResponse({
     status: HttpStatus.OK,
     description: "Registration was successful",
@@ -63,6 +64,7 @@ export class AuthController {
   }
 
   @Post("/login")
+  @ApiOperation({ title: "Login" })
   @ApiImplicitFile({
     name: "card",
     required: true,
@@ -104,6 +106,7 @@ export class AuthController {
   }
 
   @Post("/logout")
+  @ApiOperation({ title: "Logout" })
   @ApiResponse({ status: HttpStatus.OK, description: "Login was successful" })
   @ApiImplicitHeader({ name: "sessionId", required: true })
   async logout(@Req() req): Promise<ApiResponseDto> {
@@ -116,6 +119,7 @@ export class AuthController {
   }
 
   @Get("/ping")
+  @ApiOperation({ title: "Check that the network is accessible" })
   @ApiResponse({
     status: HttpStatus.OK,
     description: "Authentication is valid",

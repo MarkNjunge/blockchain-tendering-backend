@@ -1,13 +1,5 @@
-import {
-  Controller,
-  Get,
-  HttpStatus,
-  Req,
-  UseGuards,
-  HttpException,
-  BadRequestException,
-} from "@nestjs/common";
-import { ApiResponse } from "@nestjs/swagger";
+import { BadRequestException, Controller, Get, HttpStatus, Req, UseGuards } from "@nestjs/common";
+import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { ProfileService } from "./profile.service";
 import { IncomingMessage } from "http";
 import { FastifyRequest } from "fastify";
@@ -20,7 +12,8 @@ import { SessionEntity } from "../db/entities/session.entity";
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
-  @Get("/")
+  @Get()
+  @ApiOperation({ title: "Get the current signed in participant details" })
   @ApiResponse({
     status: HttpStatus.OK,
     description: "Returns the current user's information",

@@ -1,9 +1,9 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Req, UseGuards } from "@nestjs/common";
 import { BidsService } from "./bids.service";
 import { IncomingMessage } from "http";
 import { FastifyRequest } from "fastify";
 import { SessionEntity } from "../db/entities/session.entity";
-import { ApiConsumes, ApiImplicitBody, ApiImplicitFile, ApiImplicitQuery, ApiResponse } from "@nestjs/swagger";
+import { ApiConsumes, ApiImplicitBody, ApiImplicitFile, ApiImplicitQuery, ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { CreateTenderBidDto } from "./dto/CreateTenderBid.dto";
 import { Document } from "../common/document";
 import * as crypto from "crypto";
@@ -21,6 +21,7 @@ export class BidsController {
   constructor(private readonly bidService: BidsService) {}
 
   @Get()
+  @ApiOperation({ title: "Get all TenderBids" })
   @ApiImplicitQuery({ name: "bidderId", required: false })
   @ApiImplicitQuery({ name: "noticeId", required: false, description: "Will be ignored if bidderId is provided" })
   @ApiResponse({ status: 200, type: TenderBidDto, isArray: true })
@@ -39,6 +40,7 @@ export class BidsController {
   }
 
   @Post()
+  @ApiOperation({ title: "Create a TenderBid" })
   @ApiConsumes("multipart/form-data")
   @ApiImplicitFile({
     name: "bid",
@@ -90,7 +92,15 @@ export class BidsController {
     );
   }
 
+  @Delete(":id")
+  @ApiOperation({ title: "Withdraw a TenderBid" })
+  @HttpCode(HttpStatus.NOT_IMPLEMENTED)
+  async withdrawBid(@Param("session") session, @Param("id") id: string) {
+    return new ApiResponseDto(HttpStatus.NOT_IMPLEMENTED, "Not implemented", "");
+  }
+
   @Post("/:id/reject")
+  @ApiOperation({ title: "Reject a TenderBid" })
   @HttpCode(HttpStatus.OK)
   async reject(@Param("session") session, @Param("id") id: string, @Body() dto: CreateRejectionDto) {
     await this.bidService.reject(session, id, dto);
