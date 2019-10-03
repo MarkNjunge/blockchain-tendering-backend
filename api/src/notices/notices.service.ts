@@ -10,6 +10,7 @@ import { TenderNoticeDto } from "./dto/TenderNotice.dto";
 import { ResponseCodes } from "src/common/ResponseCodes";
 import { SetTenderResultDto } from "./dto/SetTenderResult.dto";
 import { TenderResultDto } from "./dto/TenderResult.dto";
+import { WithdrawNoticeDto } from "./dto/WithdrawNotice.dto";
 
 @Injectable()
 export class NoticesService {
@@ -153,6 +154,24 @@ export class NoticesService {
 
     await connection.submitTransaction(txn);
     this.logger.debug("TenderResult nullified");
+
+    await connection.disconnect();
+  }
+
+  async withdrawNotice(session: SessionEntity, tenderId: string, dto: WithdrawNoticeDto) {
+    const connection = await this.composerService.connect(session.cardName);
+    const network: BusinessNetworkDefinition = connection.getBusinessNetwork();
+    const factory: Factory = network.getFactory();
+
+    this.logger.debug(`Withdrawing TenderNotice ${tenderId}`);
+    const txn = factory.newTransaction(ComposerService.tenderNS, "WithdrawTender");
+    txn.setPropertyValue("tenderId", tenderId);
+    if (dto.reason) {
+      txn.setPropertyValue("withdrawalReason", dto.reason);
+    }
+
+    await connection.submitTransaction(txn);
+    this.logger.debug(`TenderNotice ${tenderId} nullified`);
 
     await connection.disconnect();
   }

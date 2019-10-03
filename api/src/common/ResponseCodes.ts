@@ -16,4 +16,5 @@ export class ResponseCodes {
   public static NOTICE_NULLIFIED = "noticeNullified";
   public static TENDER_BID_REJECTED = "tenderBidRejected";
   public static TENDER_BID_NOT_FOUND = "bidNotFound";
+  public static NOTICE_WITHDRAWN = "noticeWithdrawn";
 }

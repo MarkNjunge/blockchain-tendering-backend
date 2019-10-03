@@ -25,6 +25,7 @@ import { TenderNoticeDto } from "./dto/TenderNotice.dto";
 import { getRandomInt } from "../common/utils";
 import { SetTenderResultDto } from "./dto/SetTenderResult.dto";
 import { TenderResultDto } from "./dto/TenderResult.dto";
+import { WithdrawNoticeDto } from "./dto/WithdrawNotice.dto";
 
 @Controller("notices")
 @UseGuards(AuthGuard)
@@ -113,9 +114,9 @@ export class NoticesController {
 
   @Delete(":id")
   @ApiOperation({ title: "Withdraw a TenderNotice" })
-  @HttpCode(HttpStatus.NOT_IMPLEMENTED)
-  async withdrawNotice(@Param("session") session, @Param("id") id: string) {
-    return new ApiResponseDto(HttpStatus.NOT_IMPLEMENTED, "Not implemented", "");
+  async withdrawNotice(@Param("session") session, @Param("id") id: string, @Body() dto: WithdrawNoticeDto) {
+    await this.noticesService.withdrawNotice(session, id, dto);
+    return new ApiResponseDto(HttpStatus.OK, "TenderNotice withdrawn", ResponseCodes.NOTICE_WITHDRAWN);
   }
 
   @Get("/:id/result")
