@@ -114,4 +114,18 @@ export class BidsService {
     }
   }
 
+  async withdrawTenderNotice(session: SessionEntity, bidId: string) {
+    const connection = await this.composerService.connect(session.cardName);
+    const network: BusinessNetworkDefinition = connection.getBusinessNetwork();
+    const factory: Factory = network.getFactory();
+
+    this.logger.debug(`Withdrawing TenderBid ${bidId}`);
+    const txn = factory.newTransaction(ComposerService.tenderNS, "WithdrawTenderBid");
+    txn.setPropertyValue("bidId", bidId);
+
+    await connection.submitTransaction(txn);
+
+    await connection.disconnect();
+  }
+
 }

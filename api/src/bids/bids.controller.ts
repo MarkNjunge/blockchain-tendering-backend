@@ -94,9 +94,10 @@ export class BidsController {
 
   @Delete(":id")
   @ApiOperation({ title: "Withdraw a TenderBid" })
-  @HttpCode(HttpStatus.NOT_IMPLEMENTED)
   async withdrawBid(@Param("session") session, @Param("id") id: string) {
-    return new ApiResponseDto(HttpStatus.NOT_IMPLEMENTED, "Not implemented", "");
+    await this.bidService.withdrawTenderNotice(session, id);
+
+    return new ApiResponseDto(HttpStatus.OK, "TenderBid withdrawn", ResponseCodes.BID_WITHDRAWN);
   }
 
   @Post("/:id/reject")
