@@ -9,12 +9,13 @@ import {
   Res,
   Get,
   UseGuards,
+  Param,
 } from "@nestjs/common";
 import { ApiResponseDto } from "../common/dto/ApiResponse.dto";
 import {
   ApiResponse,
   ApiImplicitFile,
-  ApiImplicitHeader, ApiOperation,
+  ApiOperation,
 } from "@nestjs/swagger";
 import { CustomLogger } from "src/common/CustomLogger";
 import { AuthService } from "./auth.service";
@@ -108,13 +109,13 @@ export class AuthController {
   @Post("/logout")
   @ApiOperation({ title: "Logout" })
   @ApiResponse({ status: HttpStatus.OK, description: "Login was successful" })
-  @ApiImplicitHeader({ name: "sessionId", required: true })
-  async logout(@Req() req): Promise<ApiResponseDto> {
-    await this.authService.logout(req.headers.sessionid);
+  @UseGuards(AuthGuard)
+  async logout(@Param("session") session): Promise<ApiResponseDto> {
+    await this.authService.logout(session.sessionId);
     return new ApiResponseDto(
       HttpStatus.OK,
       "Logout successfull",
-      ResponseCodes.LOGOUT_SUCCESS,
+      ResponseCodes.LOGOUT_SUCCESS
     );
   }
 
