@@ -28,7 +28,7 @@ export class AuthService {
     return await createParticipant(connection, adminConnection, dto);
   }
 
-  async login(cardFile): Promise<string> {
+  async login(cardFile): Promise<SessionEntity> {
     const cardMetadata = await this.composerService.verifyCard(cardFile.data);
     const connection = await this.composerService.connect(
       cardMetadata.cardName,
@@ -61,7 +61,7 @@ export class AuthService {
     );
     await this.sessionRepository.save(session);
 
-    return sessionId;
+    return session;
   }
 
   async logout(sessionId: string) {

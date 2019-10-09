@@ -12,11 +12,7 @@ import {
   Param,
 } from "@nestjs/common";
 import { ApiResponseDto } from "../common/dto/ApiResponse.dto";
-import {
-  ApiResponse,
-  ApiImplicitFile,
-  ApiOperation,
-} from "@nestjs/swagger";
+import { ApiResponse, ApiImplicitFile, ApiOperation } from "@nestjs/swagger";
 import { CustomLogger } from "src/common/CustomLogger";
 import { AuthService } from "./auth.service";
 import { RegistrationDto, ParticipantType } from "./dto/Registration.dto";
@@ -90,11 +86,11 @@ export class AuthController {
       throw new BadRequestException("A business network card is required!");
     }
 
-    const sessionId = await this.authService.login(cardFile);
+    const session = await this.authService.login(cardFile);
     const sessionExpiry = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365); // 1 year
     res.header(
       "Set-Cookie",
-      `session=${sessionId}; Expires=${sessionExpiry}; HttpOnly; path=/`,
+      `session=${session.sessionId}; Expires=${sessionExpiry}; HttpOnly; path=/`,
     );
 
     res.send(
@@ -102,6 +98,7 @@ export class AuthController {
         HttpStatus.OK,
         "Login successful",
         ResponseCodes.LOGIN_SUCCESS,
+        { session },
       ),
     );
   }
@@ -115,7 +112,7 @@ export class AuthController {
     return new ApiResponseDto(
       HttpStatus.OK,
       "Logout successfull",
-      ResponseCodes.LOGOUT_SUCCESS
+      ResponseCodes.LOGOUT_SUCCESS,
     );
   }
 
