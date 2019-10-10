@@ -107,12 +107,20 @@ export class AuthController {
   @ApiOperation({ title: "Logout" })
   @ApiResponse({ status: HttpStatus.OK, description: "Login was successful" })
   @UseGuards(AuthGuard)
-  async logout(@Param("session") session): Promise<ApiResponseDto> {
+  async logout(
+    @Param("session") session,
+    @Res() res: FastifyReply<ServerResponse>,
+  ): Promise<any> {
     await this.authService.logout(session.sessionId);
-    return new ApiResponseDto(
-      HttpStatus.OK,
-      "Logout successfull",
-      ResponseCodes.LOGOUT_SUCCESS,
+
+    res.header("Set-Cookie", `session=`);
+
+    res.send(
+      new ApiResponseDto(
+        HttpStatus.OK,
+        "Logout successfull",
+        ResponseCodes.LOGOUT_SUCCESS,
+      ),
     );
   }
 
