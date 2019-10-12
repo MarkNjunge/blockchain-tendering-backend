@@ -11,6 +11,7 @@ import {
   HttpCode,
   Patch,
   Delete,
+  HttpException,
 } from "@nestjs/common";
 import { CreateTenderNoticeDto } from "./dto/CreateTenderNotice.dto";
 import { NoticesService } from "./notices.service";
@@ -33,6 +34,7 @@ import { getRandomInt } from "../common/utils";
 import { SetTenderResultDto } from "./dto/SetTenderResult.dto";
 import { TenderResultDto } from "./dto/TenderResult.dto";
 import { WithdrawNoticeDto } from "./dto/WithdrawNotice.dto";
+import * as fs from "fs";
 
 @Controller("notices")
 @UseGuards(AuthGuard)
@@ -95,6 +97,10 @@ export class NoticesController {
     type: CreateTenderNoticeDto,
   })
   async create(@Req() req) {
+    if (!req.raw.files.document.name.endsWith(".pdf")) {
+      throw new HttpException("Files must be pdf", HttpStatus.BAD_REQUEST);
+    }
+
     const dto: CreateTenderNoticeDto = req.body;
     dto.closingDate = new Date(dto.closingDate);
     dto.openingDate = new Date(dto.openingDate);
@@ -112,9 +118,10 @@ export class NoticesController {
       .update(req.raw.files.document.data)
       .digest("hex");
     const session: SessionEntity = req.params.session;
-    const docRef = `NOTICE|${session.participantId}|${
-      dto.id
-    }|${getRandomInt()}|${req.raw.files.document.name}`;
+    let docRef = `NOTICE|${session.participantId}|${dto.id}|${getRandomInt()}|${
+      req.raw.files.document.name
+    }`;
+    docRef = Buffer.from(docRef).toString("base64");
 
     const noticeDoc = new Document(
       req.raw.files.document.name,
@@ -124,6 +131,12 @@ export class NoticesController {
     );
 
     await this.noticesService.create(req.params.session, dto, noticeDoc);
+
+    // Save file
+    fs.writeFileSync(
+      `./files/documents/${docRef}`,
+      req.raw.files.document.data,
+    );
 
     return new ApiResponseDto(
       HttpStatus.CREATED,

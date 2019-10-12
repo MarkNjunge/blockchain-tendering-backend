@@ -13,6 +13,7 @@ import { NoticesController } from "./notices/notices.controller";
 import { NoticesService } from "./notices/notices.service";
 import { BidsController } from "./bids/bids.controller";
 import { BidsService } from "./bids/bids.service";
+import { FilesController } from './files/files.controller';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { BidsService } from "./bids/bids.service";
     }),
     TypeOrmModule.forFeature([SessionEntity]),
   ],
-  controllers: [AppController, AuthController, ProfileController, NoticesController, BidsController],
+  controllers: [AppController, AuthController, ProfileController, NoticesController, BidsController, FilesController],
   providers: [AppService, AuthService, ComposerService, ProfileService, NoticesService, BidsService],
 })
 export class AppModule {}
