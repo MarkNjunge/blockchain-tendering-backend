@@ -7,7 +7,7 @@ import { ServerResponse } from "http";
 @Controller("files")
 export class FilesController {
   @Get("/documents/:ref")
-  @ApiOperation({ title: "Get a specific TenderNotice" })
+  @ApiOperation({ title: "Download a document" })
   async download(
     @Param("ref") ref: string,
     @Res() res: FastifyReply<ServerResponse>,
