@@ -14,6 +14,7 @@ import {
   BusinessNetworkCardStore,
   IdCard,
   NetworkCardStoreManager,
+  BusinessNetworkDefinition,
 } from "composer-common";
 import { CustomLogger } from "../common/CustomLogger";
 import { AdminConnection } from "composer-admin";
@@ -109,5 +110,11 @@ export class ComposerService {
     return await connection.getParticipantRegistry(
       `${ComposerService.participantNS}.${participantType}`,
     );
+  }
+
+  async getNetworkDefinition(
+    connection: BusinessNetworkConnection,
+  ): Promise<BusinessNetworkDefinition> {
+    return connection.getBusinessNetwork();
   }
 }

@@ -8,7 +8,8 @@
   "scripts": {
     "create-participant": "node create-participant.js",
     "clean-docker": "node clean-docker.js",
-    "inspect-blocks": "node inspect-blocks.js"
+    "inspect-blocks": "node inspect-blocks.js",
+    "clean-cards": "node clean-cards.js"
   },
   "dependencies": {
     "asn1.js": "^5.2.0",

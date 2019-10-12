@@ -4,7 +4,11 @@ import { CustomLogger } from "../common/CustomLogger";
 import { ComposerService } from "../composer/composer.service";
 import { AssetRegistry } from "composer-client";
 import { CreateTenderBidDto } from "./dto/CreateTenderBid.dto";
-import { BusinessNetworkDefinition, Factory } from "composer-common";
+import {
+  BusinessNetworkDefinition,
+  Factory,
+  Serializer,
+} from "composer-common";
 import { Document } from "../common/document";
 import { ExtraDocumentDto } from "./dto/ExtraDocumentDto";
 import { ResponseCodes } from "../common/ResponseCodes";
@@ -28,34 +32,66 @@ export class BidsService {
     return tenderNoticeRegistry.getAll();
   }
 
-  async getAllForNotice(session: SessionEntity, noticeId: string): Promise<TenderBidDto[]> {
+  async getAllForNotice(
+    session: SessionEntity,
+    noticeId: string,
+  ): Promise<TenderBidDto[]> {
     this.logger.debug(`Fetching bids for TenderNotice ${noticeId}`);
     const connection = await this.composerService.connect(session.cardName);
-    const notice = `resource:com.marknjunge.tendering.tender.TenderNotice#${noticeId}`;
+    const bidderRegistry = await this.composerService.getParticipantRegistry(
+      connection,
+      "TenderBidder",
+    );
+    const network = await this.composerService.getNetworkDefinition(connection);
+    const serializer: Serializer = network.getSerializer();
 
-    const statement = "SELECT com.marknjunge.tendering.tender.TenderBid WHERE (tenderNotice == _$notice)";
+    const notice = `resource:com.marknjunge.tendering.tender.TenderNotice#${noticeId}`;
+    const statement =
+      "SELECT com.marknjunge.tendering.tender.TenderBid WHERE (tenderNotice == _$notice)";
     const query = await connection.buildQuery(statement);
-    return connection.query(query, { notice });
+    const bidsRes = await connection.query(query, { notice });
+
+    return await Promise.all(
+      bidsRes.map(async bid => {
+        const bidder = await bidderRegistry.get(bid.bidder.$identifier);
+
+        bid = serializer.toJSON(bid);
+        bid.bidder = bidder;
+        return bid;
+      }),
+    );
   }
 
-  async getAllForBidder(session: SessionEntity, bidderId: string): Promise<TenderBidDto[]> {
+  async getAllForBidder(
+    session: SessionEntity,
+    bidderId: string,
+  ): Promise<TenderBidDto[]> {
     this.logger.debug(`Fetching bids for TenderBidder ${bidderId}`);
     const connection = await this.composerService.connect(session.cardName);
     const bidder = `resource:com.marknjunge.tendering.participant.TenderBidder#${bidderId}`;
 
-    const statement = "SELECT com.marknjunge.tendering.tender.TenderBid WHERE (bidder == _$bidder)";
+    const statement =
+      "SELECT com.marknjunge.tendering.tender.TenderBid WHERE (bidder == _$bidder)";
     const query = await connection.buildQuery(statement);
     return connection.query(query, { bidder });
   }
 
-  async create(session: SessionEntity, dto: CreateTenderBidDto, bid: Document, extraDocuments?: ExtraDocumentDto[]) {
+  async create(
+    session: SessionEntity,
+    dto: CreateTenderBidDto,
+    bid: Document,
+    extraDocuments?: ExtraDocumentDto[],
+  ) {
     this.logger.debug(`Creating TenderBid for TenderNotice ${dto.tenderId}`);
 
     const connection = await this.composerService.connect(session.cardName);
     const network: BusinessNetworkDefinition = connection.getBusinessNetwork();
     const factory: Factory = network.getFactory();
 
-    const txn = factory.newTransaction(ComposerService.tenderNS, "CreateTenderBid");
+    const txn = factory.newTransaction(
+      ComposerService.tenderNS,
+      "CreateTenderBid",
+    );
     txn.setPropertyValue("tenderNoticeId", dto.tenderId);
     txn.setPropertyValue("bidderParticipantId", session.participantId);
     txn.setPropertyValue("bidSummary", dto.bidSummary);
@@ -63,7 +99,10 @@ export class BidsService {
     txn.setPropertyValue("documentHash", bid.hash);
 
     extraDocuments.forEach(doc => {
-      const document = factory.newConcept(ComposerService.tenderNS, "ExtraDocumentCreate");
+      const document = factory.newConcept(
+        ComposerService.tenderNS,
+        "ExtraDocumentCreate",
+      );
 
       document.key = doc.key;
       document.documentRef = doc.documentRef;
@@ -79,9 +118,17 @@ export class BidsService {
     } catch (e) {
       await this.composerService.disconnect(connection);
 
-      const msg = e.message.split("transaction returned with failure: Error: ")[1];
+      const msg = e.message.split(
+        "transaction returned with failure: Error: ",
+      )[1];
       if (e.message.includes("has not been provided")) {
-        throw new HttpException({ message: msg, responseCode: ResponseCodes.REQUIRED_DOCUMENT_MISSING }, HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          {
+            message: msg,
+            responseCode: ResponseCodes.REQUIRED_DOCUMENT_MISSING,
+          },
+          HttpStatus.BAD_REQUEST,
+        );
       } else {
         throw new HttpException(msg, HttpStatus.INTERNAL_SERVER_ERROR);
       }
@@ -94,7 +141,10 @@ export class BidsService {
     const factory: Factory = network.getFactory();
 
     this.logger.debug(`Rejecting TenderBid ${bidId} with reason ${dto.reason}`);
-    const txn = factory.newTransaction(ComposerService.tenderNS, "CreateTenderRejection");
+    const txn = factory.newTransaction(
+      ComposerService.tenderNS,
+      "CreateTenderRejection",
+    );
     txn.setPropertyValue("bidId", bidId);
     txn.setPropertyValue("reason", dto.reason);
     txn.setPropertyValue("reasonNarrative", dto.reasonNarrative);
@@ -105,9 +155,14 @@ export class BidsService {
 
       await connection.disconnect();
     } catch (e) {
-      const msg = e.message.split("transaction returned with failure: Error: ")[1];
+      const msg = e.message.split(
+        "transaction returned with failure: Error: ",
+      )[1];
       if (e.message.includes("does not exist")) {
-        throw new HttpException({ message: msg, responseCode: ResponseCodes.TENDER_BID_NOT_FOUND }, HttpStatus.NOT_FOUND);
+        throw new HttpException(
+          { message: msg, responseCode: ResponseCodes.TENDER_BID_NOT_FOUND },
+          HttpStatus.NOT_FOUND,
+        );
       } else {
         throw new HttpException(msg, HttpStatus.INTERNAL_SERVER_ERROR);
       }
@@ -120,12 +175,14 @@ export class BidsService {
     const factory: Factory = network.getFactory();
 
     this.logger.debug(`Withdrawing TenderBid ${bidId}`);
-    const txn = factory.newTransaction(ComposerService.tenderNS, "WithdrawTenderBid");
+    const txn = factory.newTransaction(
+      ComposerService.tenderNS,
+      "WithdrawTenderBid",
+    );
     txn.setPropertyValue("bidId", bidId);
 
     await connection.submitTransaction(txn);
 
     await connection.disconnect();
   }
-
 }
