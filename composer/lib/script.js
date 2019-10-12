@@ -267,6 +267,7 @@ async function WithdrawTenderBid(tx) {
   const bid = await tenderBidRegistry.get(tx.bidId);
 
   bid.withdrawn = true;
+  bid.status = "WITHDRAWN";
 
   await tenderBidRegistry.update(bid);
 }
@@ -353,6 +354,12 @@ async function CreateTenderResult(tx) {
   await tenderNoticeRegistry.update(tender);
 
   await tenderResultRegistry.add(result);
+
+  // Set the bid as accepted
+  bid.status = "ACCEPTED";
+  // Set the winning result on the bid
+  bid.result = result;
+  await tenderBidRegistry.update(bid);
 }
 
 /**
@@ -421,6 +428,12 @@ async function CreateTenderRejection(tx) {
   rejection.reasonNarrative = tx.reasonNarrative;
 
   await tenderRejectionRegistry.add(rejection);
+
+  // Set the bid as rejeted
+  bid.status = "REJECTED";
+  // Set the rejection notice on the bid
+  bid.rejection = rejection;
+  await tenderBidRegistry.update(bid);
 }
 
 function getRandomInt(max) {

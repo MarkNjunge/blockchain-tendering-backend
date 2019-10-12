@@ -88,6 +88,13 @@ concept ExtraDocumentCreate {
   o String documentRef
   o String documentHash
 }
+
+enum BidStatus {
+  o ACTIVE
+  o WITHDRAWN
+  o ACCEPTED
+  o REJECTED
+}
   
 asset TenderBid identified by bidId {
  o String bidId
@@ -98,6 +105,9 @@ asset TenderBid identified by bidId {
  o Document bidDocument
  o ExtraDocument[] requiredDocuments
  o Boolean withdrawn default=false
+ o BidStatus status default="ACTIVE"
+ o TenderResult result optional
+ o TenderRejection rejection optional
 }
 
 transaction CreateTenderBid {
