@@ -6,6 +6,14 @@ rule AllParticipantsCanAccessAllAssets {
     action: ALLOW
 }
 
+rule AllParticipantsCanReadAllOtherParticipants{
+    description: "Grant participants read access to all other participants"
+    participant: "com.marknjunge.tendering.participant.**"
+    operation: READ
+    resource: "com.marknjunge.tendering.participant.**"
+    action: ALLOW
+}
+
 rule ParticipantsFullAccessNetwork {
     description: "Grant participants read access to system resources"
     participant: "com.marknjunge.tendering.participant.**"
