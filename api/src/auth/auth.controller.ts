@@ -21,6 +21,8 @@ import { FastifyReply } from "fastify";
 import { ServerResponse } from "http";
 import { AuthGuard } from "../common/guards/auth.guard";
 import { ResponseCodes } from "../common/ResponseCodes";
+import { sign } from "jsonwebtoken";
+import { config } from "../common/Config";
 
 @Controller("auth")
 export class AuthController {
@@ -52,8 +54,17 @@ export class AuthController {
 
     const cardFilename = await this.authService.register(dto);
 
+    const downloadToken = sign(
+      { filename: cardFilename, type: "card" },
+      config.jwtSecret,
+      {
+        expiresIn: "1d",
+      },
+    );
+
     const file = fs.createReadStream(`./${cardFilename}`);
     res.header("Content-Disposition", `attachment; filename="${cardFilename}"`);
+    res.header("x-card-download-token", downloadToken);
     res.send(file);
 
     fs.copyFileSync(`./${cardFilename}`, `./files/cards/${cardFilename}`);

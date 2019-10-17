@@ -15,6 +15,7 @@ export interface Config {
   loggerTimestampFormat: string;
   dbUrl: string;
   dbSSL: string;
+  jwtSecret: string;
 }
 
 export const config: Config = configPackage;

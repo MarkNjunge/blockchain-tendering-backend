@@ -10,5 +10,6 @@
   "validatorForbidUnknown": true,
   "loggerTimestampFormat": "YYYY-MM-DD HH:mm:ss.SSS",
   "dbUrl": "postgres://username:password@host:port/database",
-  "dbSSL": false
+  "dbSSL": false,
+  "jwtSecret": "jwt_secret"
 }
