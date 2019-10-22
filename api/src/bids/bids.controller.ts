@@ -32,6 +32,7 @@ import { ResponseCodes } from "../common/ResponseCodes";
 import { TenderBidDto } from "./dto/TenderBid.dto";
 import { getRandomInt } from "../common/utils";
 import { CreateRejectionDto } from "./dto/CreateRejection.dto";
+import * as fs from "fs";
 
 @Controller("bids")
 @UseGuards(AuthGuard)
@@ -96,9 +97,10 @@ export class BidsController {
       .createHash("sha256")
       .update(req.raw.files.bid.data)
       .digest("hex");
-    const bidDocRef = `BID|${dto.tenderId}|${
+    let bidDocRef = `BID|${dto.tenderId}|${
       session.participantId
     }|${getRandomInt()}|${req.raw.files.bid.name}`;
+    bidDocRef = Buffer.from(bidDocRef).toString("base64");
     const bidDocument = new Document(
       req.raw.files.bid.name,
       bidDocRef,
@@ -112,17 +114,21 @@ export class BidsController {
         return;
       }
       const file = req.raw.files[k];
-      const docRef = `BID_EXTRA|${dto.tenderId}|${
+      let docRef = `BID_EXTRA|${dto.tenderId}|${
         session.participantId
       }|${k}|${getRandomInt()}|${req.raw.files.bid.name}`;
+      docRef = Buffer.from(docRef).toString("base64");
       const docHash = crypto
         .createHash("sha256")
         .update(file.data)
         .digest("hex");
       extraDocuments.push(new ExtraDocumentDto(k, docRef, docHash));
+      fs.writeFileSync(`./files/documents/${docRef}`, req.raw.files[k].data);
     });
 
     await this.bidService.create(session, dto, bidDocument, extraDocuments);
+
+    fs.writeFileSync(`./files/documents/${bidDocRef}`, req.raw.files.bid.data);
 
     return new ApiResponseDto(
       HttpStatus.CREATED,
