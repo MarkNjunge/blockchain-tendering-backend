@@ -103,7 +103,7 @@ asset TenderBid identified by bidId {
  o String summary
  o DateTime datePosted
  o Document bidDocument
- o ExtraDocument[] requiredDocuments
+ o ExtraDocument[] requiredDocuments optional
  o Boolean withdrawn default=false
  o BidStatus status default="ACTIVE"
  o TenderResult result optional
@@ -116,7 +116,7 @@ transaction CreateTenderBid {
   o String bidSummary // [60,5] Contains the total price, tender security
   o String documentRef
   o String documentHash
-  o ExtraDocumentCreate[] requiredDocuments
+  o ExtraDocumentCreate[] requiredDocuments optional
 }
 
 transaction WithdrawTenderBid {
