@@ -69,11 +69,27 @@ export class BidsService {
     this.logger.debug(`Fetching bids for TenderBidder ${bidderId}`);
     const connection = await this.composerService.connect(session.cardName);
     const bidder = `resource:com.marknjunge.tendering.participant.TenderBidder#${bidderId}`;
+    const noticeRegistry = await this.composerService.getAssetRegistry(
+      connection,
+      "TenderNotice",
+    );
+    const network = await this.composerService.getNetworkDefinition(connection);
+    const serializer: Serializer = network.getSerializer();
 
     const statement =
       "SELECT com.marknjunge.tendering.tender.TenderBid WHERE (bidder == _$bidder)";
     const query = await connection.buildQuery(statement);
-    return connection.query(query, { bidder });
+    const bidsRes = await connection.query(query, { bidder });
+
+    return await Promise.all(
+      bidsRes.map(async bid => {
+        const notice = await noticeRegistry.get(bid.tenderNotice.$identifier);
+
+        bid = serializer.toJSON(bid);
+        bid.tenderNotice = notice;
+        return bid;
+      }),
+    );
   }
 
   async create(

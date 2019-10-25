@@ -112,6 +112,15 @@ export class ComposerService {
     );
   }
 
+  async getAssetRegistry(
+    connection: BusinessNetworkConnection,
+    assetName: string,
+  ): Promise<ParticipantRegistry> {
+    return await connection.getAssetRegistry(
+      `${ComposerService.tenderNS}.${assetName}`,
+    );
+  }
+
   async getNetworkDefinition(
     connection: BusinessNetworkConnection,
   ): Promise<BusinessNetworkDefinition> {
