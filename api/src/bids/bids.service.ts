@@ -92,6 +92,23 @@ export class BidsService {
     );
   }
 
+  async getForBidderOnNotice(
+    session: SessionEntity,
+    bidderId: string,
+    noticeId: string,
+  ): Promise<TenderBidDto> {
+    this.logger.debug(`Fetching bids for TenderBidder ${bidderId}`);
+    const connection = await this.composerService.connect(session.cardName);
+    const bidder = `resource:com.marknjunge.tendering.participant.TenderBidder#${bidderId}`;
+    const notice = `resource:com.marknjunge.tendering.tender.TenderNotice#${noticeId}`;
+
+    const statement =
+      "SELECT com.marknjunge.tendering.tender.TenderBid WHERE (bidder == _$bidder AND tenderNotice == _$notice)";
+    const query = await connection.buildQuery(statement);
+    const bids = await connection.query(query, { bidder, notice });
+    return bids[0];
+  }
+
   async create(
     session: SessionEntity,
     dto: CreateTenderBidDto,

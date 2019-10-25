@@ -9,6 +9,7 @@ import {
   Post,
   Req,
   UseGuards,
+  HttpException,
 } from "@nestjs/common";
 import { BidsService } from "./bids.service";
 import { IncomingMessage } from "http";
@@ -73,6 +74,28 @@ export class BidsController {
     const bidderId = session.participantId;
 
     return this.bidService.getAllForBidder(session, bidderId);
+  }
+
+  @Get("/forCurrent/:noticeId")
+  @ApiOperation({ title: "Get the bid for the current user on the notice" })
+  @ApiResponse({ status: 200, type: TenderBidDto, isArray: true })
+  async getBidsForUserOnNotice(
+    @Param("session") session,
+    @Param("noticeId") noticeId: string,
+  ): Promise<TenderBidDto> {
+    const bidderId = session.participantId;
+
+    const bids = await this.bidService.getForBidderOnNotice(
+      session,
+      bidderId,
+      noticeId,
+    );
+
+    if (bids) {
+      return bids;
+    } else {
+      throw new HttpException("No bid placed on tender", HttpStatus.NOT_FOUND);
+    }
   }
 
   @Post()
