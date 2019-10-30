@@ -190,21 +190,28 @@ function decodeBlock(block) {
     data: {
       // signature: block.data.data[0].signature.toString("base64"),
       payload: {
-        // header: {
-        //   channelHeader: {
-        //     type: block.data.data[0].payload.header.channel_header.typeString,
-        //     timestamp:
-        //       block.data.data[0].payload.header.channel_header.timestamp,
-        //     tx_id: block.data.data[0].payload.header.channel_header.tx_id
-        //   },
-        //   signatureHeader: {
-        //     creator: {
-        //       Mspid:
-        //         block.data.data[0].payload.header.signature_header.creator
-        //           .Mspid
-        //     }
-        //   }
-        // },
+        header: {
+          channelHeader: {
+            type: block.data.data[0].payload.header.channel_header.type,
+            typeString:
+              block.data.data[0].payload.header.channel_header.typeString,
+            channelId:
+              block.data.data[0].payload.header.channel_header.channel_id,
+            timestamp:
+              block.data.data[0].payload.header.channel_header.timestamp,
+            tx_id: block.data.data[0].payload.header.channel_header.tx_id
+          },
+          signatureHeader: {
+            creator: {
+              Mspid:
+                block.data.data[0].payload.header.signature_header.creator
+                  .Mspid,
+              idBytes:
+                block.data.data[0].payload.header.signature_header.creator
+                  .IdBytes
+            }
+          }
+        },
         data: {
           results: {
             ...block.data.data[0].payload.data.actions[0].payload.action.proposal_response_payload.extension.results.ns_rwset
