@@ -214,7 +214,7 @@ function decodeBlock(block) {
                 writes: set.rwset.writes.map(write => ({
                   key: write.key,
                   isDelete: write.isDelete,
-                  value: write.value.replace(/"/g, "'")
+                  value: JSON.parse(write.value)
                 }))
               }))
           }
