@@ -13,7 +13,7 @@ Built using [Hyperledger](https://www.hyperledger.org/)([Composer](https://www.h
 2. Clone this repository
 
 ```
-git clone https://github.com/MarkNjunge/blockchain-tendering-backedn.git
+git clone https://github.com/MarkNjunge/blockchain-tendering-backend.git
 ```
 
 3. Generate and install the business network archive.
@@ -22,10 +22,10 @@ git clone https://github.com/MarkNjunge/blockchain-tendering-backedn.git
 yarn composer:deploy
 ```
 
-4. Start default rest server
+4. Start the rest server
 
 ```
-yarn composer:start:rest
+yarn api:start
 ```
 
 ## Scripts
@@ -50,9 +50,14 @@ Logs the details of the blocks on the blockchain.
 
 ### api
 
+#### api:start
+
+Start a REST server.
+
 #### api:start:dev
 
 Start a REST server in dev mode.
+**Doesn't work because of Composer**
 
 ### composer
 

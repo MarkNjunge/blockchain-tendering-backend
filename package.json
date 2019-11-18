@@ -10,6 +10,7 @@
     "admin:create-participant": "yarn --cwd admin create-participant",
     "admin:inspect-blocks": "yarn --cwd admin inspect-blocks",
     "admin:clean-cards": "yarn --cwd admin clean-cards",
+    "api:start": "yarn --cwd api start",
     "api:start:dev": "yarn --cwd api start:dev",
     "composer:build": "yarn --cwd composer build",
     "composer:deploy": "yarn --cwd composer deploy",
