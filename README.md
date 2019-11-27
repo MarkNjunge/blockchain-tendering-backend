@@ -13,7 +13,7 @@ Built using [Hyperledger](https://www.hyperledger.org/)([Composer](https://www.h
 2. Clone this repository
 
 ```
-git clone https://github.com/MarkNjunge/blockchain-tendering-backend.git
+git clone https://github.com/MarkNjunge/blockchain-tendering-backend.git && cd blockchain-tendering-backend
 ```
 
 3. Generate and install the business network archive.
@@ -22,7 +22,17 @@ git clone https://github.com/MarkNjunge/blockchain-tendering-backend.git
 yarn composer:deploy
 ```
 
-4. Start the rest server
+4. Create a PostgeSQL database (used for sessions)
+
+5. Create a copy of the config file
+
+```
+cp ./api/config/default.json cp ./api/config/local.json
+```
+
+**Note:** change the `dbUrl` value to your connection.
+
+6. Start the rest server
 
 ```
 yarn api:start
@@ -47,6 +57,10 @@ Creates a participant, as well as an identity and a card to be used for authenti
 #### admin:inspect-blocks
 
 Logs the details of the blocks on the blockchain.
+
+#### admin:clean-cards
+
+Delete all card for the `tendering` network.
 
 ### api
 
@@ -74,3 +88,7 @@ Bumps the patch level npm version, creates a new archive and installs it on Fabr
 #### composer:start:rest
 
 Starts the default `composer-rest-server` using the admin card.
+
+#### composer:start
+
+Start the network when it's stopped.
